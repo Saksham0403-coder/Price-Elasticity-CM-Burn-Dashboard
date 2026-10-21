@@ -1,0 +1,881 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Price Elasticity & CM Dashboard</title>
+<style>
+:root{--bg:#f3f5fb;--card:#ffffff;--ink:#0f172a;--mut:#64748b;--line:#e6e9f2;--pri:#6366f1;--pri2:#8b5cf6;
+--good:#059669;--goodbg:#d1fae5;--avg:#d97706;--avgbg:#fef3c7;--bad:#e11d48;--badbg:#ffe4e6;--low:#64748b;--lowbg:#eef2f7;--we:#f97316;--wd:#6366f1;
+--sh:0 1px 2px rgba(15,23,42,.04),0 8px 24px -12px rgba(15,23,42,.18)}
+*{box-sizing:border-box}
+body{margin:0;font:13px/1.5 "Inter","Segoe UI",-apple-system,Roboto,Arial,sans-serif;color:var(--ink);
+background:radial-gradient(1200px 500px at 0% -10%,#e0e7ff 0,transparent 60%),radial-gradient(900px 500px at 100% 0,#fce7f3 0,transparent 55%),var(--bg);min-height:100vh}
+header{background:linear-gradient(120deg,#312e81 0%,#4f46e5 35%,#7c3aed 65%,#db2777 100%);color:#fff;padding:22px 28px 64px;display:flex;align-items:center;gap:16px;flex-wrap:wrap;position:relative;overflow:hidden}
+header:after{content:"";position:absolute;right:-80px;top:-120px;width:380px;height:380px;border-radius:50%;background:rgba(255,255,255,.08)}
+header:before{content:"";position:absolute;left:30%;bottom:-160px;width:300px;height:300px;border-radius:50%;background:rgba(255,255,255,.06)}
+header h1{font-size:22px;margin:0;font-weight:800;letter-spacing:-.3px}header .meta{color:rgba(255,255,255,.8);font-size:12px;margin-top:4px}
+.badge{display:inline-block;background:rgba(255,255,255,.18);border:1px solid rgba(255,255,255,.25);padding:2px 9px;border-radius:999px;font-size:11px;font-weight:600;margin-bottom:6px;letter-spacing:.3px}
+.upl{margin-left:auto;display:flex;gap:8px;align-items:center;position:relative;z-index:1}
+.btn{border:1px solid var(--line);background:#fff;color:var(--ink);padding:8px 14px;border-radius:10px;cursor:pointer;font-weight:600;font-size:12.5px;transition:.15s}
+.btn:hover{transform:translateY(-1px);box-shadow:0 6px 16px -8px rgba(79,70,229,.5)}.btn:disabled{opacity:.4;cursor:default;transform:none;box-shadow:none}
+.btn.pri{background:#fff;color:#4338ca;border:0;box-shadow:0 10px 24px -10px rgba(0,0,0,.45);padding:10px 18px;font-weight:700}
+.wrap{padding:0 28px 24px;max-width:1720px;margin:-44px auto 0;position:relative;z-index:2}
+.card{background:var(--card);border:1px solid rgba(226,232,240,.8);border-radius:18px;padding:18px 20px;margin-bottom:18px;box-shadow:var(--sh)}
+.card h2{font-size:15px;margin:0 0 12px;display:flex;align-items:center;gap:10px;flex-wrap:wrap;font-weight:750}
+.card h2:before{content:"";width:5px;height:18px;border-radius:4px;background:linear-gradient(180deg,var(--pri),#ec4899)}
+.card h2 .sub{font-weight:400;color:var(--mut);font-size:12px}
+.filters{display:grid;grid-template-columns:repeat(auto-fill,minmax(185px,1fr));gap:12px;align-items:end}
+label.f{display:flex;flex-direction:column;gap:4px;font-size:11px;color:var(--mut);font-weight:700;text-transform:uppercase;letter-spacing:.4px}
+input,select{border:1px solid var(--line);border-radius:10px;padding:8px 10px;font-size:12.5px;background:#f8fafc;color:var(--ink);width:100%;transition:.15s;text-transform:none;letter-spacing:0;font-weight:500}
+input:focus,select:focus{outline:0;border-color:var(--pri);background:#fff;box-shadow:0 0 0 3px rgba(99,102,241,.15)}
+.kpis{display:grid;grid-template-columns:repeat(auto-fill,minmax(190px,1fr));gap:14px}
+.kpi{position:relative;overflow:hidden;border-radius:18px;padding:16px 16px 14px;color:#fff;box-shadow:0 12px 28px -14px rgba(15,23,42,.45);transition:.2s;min-height:118px}
+.kpi:hover{transform:translateY(-3px)}
+.kpi:after{content:"";position:absolute;right:-30px;bottom:-40px;width:120px;height:120px;border-radius:50%;background:rgba(255,255,255,.13)}
+.kpi .ic{width:34px;height:34px;border-radius:10px;background:rgba(255,255,255,.22);display:flex;align-items:center;justify-content:center;margin-bottom:8px}
+.kpi .ic svg{width:18px;height:18px;stroke:#fff;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+.kpi .l{font-size:11px;font-weight:700;opacity:.9;text-transform:uppercase;letter-spacing:.5px}.kpi .v{font-size:24px;font-weight:800;margin-top:1px;letter-spacing:-.4px}.kpi .s{font-size:11.5px;opacity:.88;position:relative;z-index:1}
+.kpi .neg,.kpi .pos{color:#fff}
+.kpi.k0{background:linear-gradient(135deg,#6366f1,#8b5cf6)}.kpi.k1{background:linear-gradient(135deg,#0ea5e9,#2563eb)}.kpi.k2{background:linear-gradient(135deg,#14b8a6,#0891b2)}
+.kpi.k3{background:linear-gradient(135deg,#f59e0b,#f97316)}.kpi.k4{background:linear-gradient(135deg,#f43f5e,#be123c)}.kpi.k5{background:linear-gradient(135deg,#ec4899,#a21caf)}
+.kpi.k6{background:linear-gradient(135deg,#fb7185,#e11d48)}.kpi.k7{background:linear-gradient(135deg,#a855f7,#6d28d9)}.kpi.k8{background:linear-gradient(135deg,#64748b,#334155)}
+.kpi.k9{background:linear-gradient(135deg,#f97316,#db2777)}.kpi.k10{background:linear-gradient(135deg,#10b981,#047857)}
+.kpi .mini{display:inline-block;background:rgba(255,255,255,.22);border-radius:6px;padding:0 6px;margin:2px 3px 0 0;font-weight:700}
+.kpi.empty{background:linear-gradient(135deg,#6366f1,#db2777);grid-column:1/-1;text-align:center;padding:34px}
+.neg{color:var(--bad)}.pos{color:var(--good)}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:18px}.grid3{display:grid;grid-template-columns:repeat(3,1fr);gap:18px}
+@media(max-width:1100px){.grid2,.grid3{grid-template-columns:1fr}}
+.grid2>.card,.grid3>.card{margin-bottom:18px}
+.chartbox{position:relative;height:290px}canvas{width:100%;height:100%;display:block}
+.donutbox{position:relative;height:200px}
+.dleg{display:grid;grid-template-columns:1fr 1fr;gap:4px 12px;margin-top:8px;font-size:11.5px}.dleg div{display:flex;align-items:center;gap:6px;color:#334155}.dleg i{width:10px;height:10px;border-radius:3px;display:inline-block}.dleg b{margin-left:auto}
+.tip{position:absolute;pointer-events:none;background:rgba(15,23,42,.94);color:#fff;padding:8px 10px;border-radius:10px;font-size:11.5px;white-space:nowrap;display:none;z-index:5;box-shadow:0 10px 24px -8px rgba(0,0,0,.4);line-height:1.55}
+.legend{display:flex;gap:14px;font-size:11.5px;color:var(--mut);margin-top:6px;flex-wrap:wrap}.legend i{display:inline-block;width:10px;height:10px;border-radius:3px;margin-right:5px;vertical-align:-1px}
+.tbl{overflow:auto;max-height:640px;border:1px solid var(--line);border-radius:14px}
+table{border-collapse:separate;border-spacing:0;width:100%;font-size:12px}
+th{position:sticky;top:0;background:linear-gradient(180deg,#eef2ff,#e0e7ff);text-align:left;padding:9px 10px;border-bottom:1px solid #c7d2fe;white-space:nowrap;cursor:pointer;user-select:none;font-size:11px;color:#3730a3;z-index:1;text-transform:uppercase;letter-spacing:.3px;font-weight:700}
+th:hover{background:#c7d2fe}td{padding:8px 10px;border-bottom:1px solid #f1f5f9;white-space:nowrap;vertical-align:top}
+tbody tr:nth-child(even) td{background:#fafbff}tbody tr:hover td{background:#f5f3ff}
+td.n,th.n{text-align:right}td.wrapc{white-space:normal;min-width:300px;max-width:460px;color:#334155}td.title{max-width:220px;overflow:hidden;text-overflow:ellipsis}
+.pill{display:inline-block;padding:3px 10px;border-radius:999px;font-size:11px;font-weight:700}
+.p-Good{background:linear-gradient(135deg,#d1fae5,#a7f3d0);color:#047857}.p-Average{background:linear-gradient(135deg,#fef3c7,#fde68a);color:#b45309}.p-Worst{background:linear-gradient(135deg,#ffe4e6,#fecdd3);color:#be123c}.p-Low{background:var(--lowbg);color:var(--low)}
+.chk{display:inline-block;font-size:10.5px;padding:2px 6px;border-radius:6px;margin:0 3px 3px 0;font-weight:600}
+.c-good{background:var(--goodbg);color:var(--good)}.c-avg{background:var(--avgbg);color:var(--avg)}.c-worst{background:var(--badbg);color:var(--bad)}.c-na{background:var(--lowbg);color:var(--low)}
+.drv{font-size:11px;font-weight:700;padding:2px 8px;border-radius:999px}.d-we{color:#c2410c;background:#ffedd5}.d-wd{color:#4338ca;background:#e0e7ff}.d-st{color:var(--mut);background:#f1f5f9}
+.star{color:#f59e0b;font-weight:800}
+.tabs{display:flex;gap:6px;margin-bottom:12px;flex-wrap:wrap;background:#f1f5f9;padding:5px;border-radius:14px;width:fit-content;max-width:100%}
+.tab{padding:8px 14px;border-radius:10px;cursor:pointer;font-weight:650;font-size:12px;color:#475569;transition:.15s}
+.tab:hover{background:#fff}.tab.on{background:linear-gradient(135deg,#6366f1,#8b5cf6);color:#fff;box-shadow:0 6px 16px -8px rgba(99,102,241,.8)}
+.pager{display:flex;gap:8px;align-items:center;justify-content:flex-end;margin-top:10px;color:var(--mut);font-size:12px}
+.gr{display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:12px}
+.gr .g{border:1px solid var(--line);border-radius:14px;padding:10px 12px;background:linear-gradient(180deg,#fff,#f8fafc)}.gr .g b{font-size:12px}.gr .row{display:flex;gap:6px;margin-top:6px;align-items:center;font-size:11.5px;color:var(--mut)}.gr input{width:84px;padding:5px 7px}
+.note{font-size:11.5px;color:var(--mut)}
+.wk{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:12px;margin-bottom:14px}
+.wk .b{border-radius:16px;padding:14px;color:#fff;position:relative;overflow:hidden;box-shadow:0 10px 24px -14px rgba(15,23,42,.5)}
+.wk .b:after{content:"";position:absolute;right:-24px;top:-24px;width:90px;height:90px;border-radius:50%;background:rgba(255,255,255,.14)}
+.wk .b .v{font-size:26px;font-weight:800}.wk .b .l{font-size:12px;font-weight:700;opacity:.95}.wk .b .s{font-size:11px;opacity:.9;position:relative}
+.insight{border-radius:12px;padding:10px 12px;margin-top:10px;font-size:12px;background:linear-gradient(135deg,#eef2ff,#fdf2f8);color:#312e81;border:1px solid #e0e7ff}
+#overlay{position:fixed;inset:0;background:rgba(15,23,42,.55);backdrop-filter:blur(3px);display:none;align-items:center;justify-content:center;z-index:50}
+#overlay .box{background:#fff;border-radius:18px;padding:26px 30px;min-width:320px;text-align:center;box-shadow:var(--sh)}
+.spin{width:40px;height:40px;border:4px solid #e0e7ff;border-top-color:#7c3aed;border-radius:50%;animation:s 1s linear infinite;margin:0 auto 12px}@keyframes s{to{transform:rotate(360deg)}}
+#toast{position:fixed;bottom:20px;left:50%;transform:translateX(-50%);background:linear-gradient(135deg,#4f46e5,#db2777);color:#fff;padding:11px 18px;border-radius:12px;display:none;z-index:60;font-size:12.5px;box-shadow:0 12px 28px -10px rgba(0,0,0,.5)}
+#drop{display:none;position:fixed;inset:0;background:rgba(99,102,241,.15);border:3px dashed var(--pri);z-index:40;align-items:center;justify-content:center;font-size:20px;font-weight:800;color:var(--pri)}
+.empty{padding:30px;text-align:center;color:var(--mut)}
+details summary{cursor:pointer;font-weight:700;font-size:13px}
+</style></head><body>
+<header>
+  <div style="position:relative;z-index:1"><span class="badge">PRICING INTELLIGENCE</span><h1>Price Elasticity · CM · Burn Dashboard</h1><div class="meta" id="fileMeta"></div></div>
+  <div class="upl">
+    <input type="file" id="file" accept=".xlsx,.csv" hidden>
+    <button class="btn pri" id="uplBtn">⬆ Upload new file (.xlsx / .csv)</button>
+  </div>
+</header>
+<div id="drop">Drop the file to replace the current data</div>
+<div id="overlay"><div class="box"><div class="spin"></div><div id="ovMsg" style="font-weight:600">Reading file…</div><div class="note" id="ovSub"></div></div></div>
+<div id="toast"></div>
+
+<div class="wrap">
+  <div class="card">
+    <h2>Filters <span class="sub">— every number, chart, verdict and remark below recalculates from these</span></h2>
+    <div class="filters">
+      <label class="f">Product ID<input id="fPid" list="dlPid" placeholder="All (comma-separate for many)"></label>
+      <label class="f">UPC / Vendor SKU code<input id="fUpc" list="dlUpc" placeholder="All (comma-separate for many)"></label>
+      <label class="f">Brand<select id="fBrand"></select></label>
+      <label class="f">Category (L2)<select id="fL2"></select></label>
+      <label class="f">From date<input type="date" id="fFrom"></label>
+      <label class="f">To date<input type="date" id="fTo"></label>
+      <label class="f">Days<select id="fDay"><option value="all">All days (incl. Sat & Sun)</option><option value="wd">Mon–Fri only (excl. Sat & Sun)</option><option value="we">Sat & Sun only</option></select></label>
+      <label class="f">Verdict<select id="fVer"><option value="">All verdicts</option><option>Good</option><option>Average</option><option>Worst</option><option value="Low">Low data</option></select></label>
+      <label class="f">Title search<input id="fTitle" placeholder="e.g. earphones"></label>
+      <div style="display:flex;gap:6px"><button class="btn" id="clr">Clear filters</button></div>
+    </div>
+    <datalist id="dlPid"></datalist><datalist id="dlUpc"></datalist>
+  </div>
+
+  <div class="kpis" id="kpis" style="margin-bottom:18px"></div>
+  <div class="grid3">
+    <div class="card"><h2>Price-point verdict mix <span class="sub">by count</span></h2><div class="donutbox"><canvas id="d1"></canvas><div class="tip"></div></div><div class="dleg" id="d1l"></div></div>
+    <div class="card"><h2>Orders: weekday vs weekend <span class="sub">net orders</span></h2><div class="donutbox"><canvas id="d2"></canvas><div class="tip"></div></div><div class="dleg" id="d2l"></div></div>
+    <div class="card"><h2>Orders by coin % band <span class="sub">share of net orders</span></h2><div class="donutbox"><canvas id="d3"></canvas><div class="tip"></div></div><div class="dleg" id="d3l"></div></div>
+  </div>
+
+  <div class="card">
+    <details id="grBox"><summary>Guardrails (used for Good / Average / Worst — edit and everything re-scores) · <span class="note" id="grSum"></span></summary>
+    <div class="gr" style="margin-top:10px">
+      <div class="g"><b>CM % = Σ CM ÷ Σ Net GMV</b><div class="row">Good ≥ <input type="number" step="0.5" id="gCmG"> %</div><div class="row">Worst &lt; <input type="number" step="0.5" id="gCmW"> %</div></div>
+      <div class="g"><b>Burn / net order = −Σ CM ÷ Σ Net orders</b><div class="row">Good ≤ ₹ <input type="number" step="5" id="gBuG"></div><div class="row">Worst &gt; ₹ <input type="number" step="5" id="gBuW"></div></div>
+      <div class="g"><b>Velocity = orders/day ÷ product avg across its prices</b><div class="row">Good ≥ <input type="number" step="0.05" id="gVeG"> ×</div><div class="row">Worst &lt; <input type="number" step="0.05" id="gVeW"> ×</div></div>
+      <div class="g"><b>Minimum data & weekend</b><div class="row">Min net orders <input type="number" step="1" id="gMin"></div><div class="row">Weekend-driven if lift ≥ <input type="number" step="5" id="gWe"> %</div></div>
+      <div class="g"><b>Best-pricing pick (per PID)</b><div class="row">Similar DRR if within <input type="number" step="1" id="gTie"> %</div><div class="row" style="display:block">Eligible = CM% and burn not in worst zone, ≥ min orders. Highest DRR wins; if DRRs are similar, better CM% wins.</div></div>
+    </div>
+    <p class="note">Rule: <b>Worst</b> if any guardrail is in the worst zone · <b>Good</b> if every applicable guardrail is in the good zone · otherwise <b>Average</b> · below min orders = <b>Low data</b>. Velocity is “n/a” when a product has only one price point. Orders = Σ net_orders · GMV = Σ net_gmv · Burn = Σ CM · CM% = Σ CM ÷ Σ net_gmv · Price = selling_price.</p>
+    </details>
+  </div>
+
+  <div class="grid2">
+    <div class="card"><h2 id="c1t">Price elasticity <span class="sub" id="c1s"></span></h2><div class="chartbox"><canvas id="c1"></canvas><div class="tip"></div></div><div class="legend" id="c1l"></div></div>
+    <div class="card"><h2>Daily trend <span class="sub">Net orders (Sat/Sun highlighted) & CM %</span></h2><div class="chartbox"><canvas id="c2"></canvas><div class="tip"></div></div><div class="legend"><span><i style="background:var(--wd)"></i>Mon–Fri net orders</span><span><i style="background:var(--we)"></i>Sat/Sun net orders</span><span><i style="background:#f43f5e"></i>CM %</span></div></div>
+  </div>
+
+  <div class="grid2">
+    <div class="card"><h2>Coin % performance <span class="sub">Coin % = coin used ÷ selling price · net orders & CM % by coin band</span></h2><div class="chartbox"><canvas id="c4"></canvas><div class="tip"></div></div>
+      <div class="legend"><span><i style="background:#10b981"></i>CM% in good zone</span><span><i style="background:#f59e0b"></i>between</span><span><i style="background:#f43f5e"></i>CM% in worst zone</span><span><i style="background:#f43f5e;height:3px"></i>CM %</span></div><div class="insight" id="coinNote"></div></div>
+    <div class="card"><h2>Cash performance <span class="sub">Cash = selling price − coin used · net orders & CM % by cash band</span></h2><div class="chartbox"><canvas id="c5"></canvas><div class="tip"></div></div>
+      <div class="legend"><span><i style="background:#10b981"></i>CM% in good zone</span><span><i style="background:#f59e0b"></i>between</span><span><i style="background:#f43f5e"></i>CM% in worst zone</span><span><i style="background:#f43f5e;height:3px"></i>CM %</span></div><div class="insight" id="cashNote"></div></div>
+  </div>
+
+  <div class="card">
+    <h2>Saturday & Sunday effect <span class="sub">Which price points drive good orders with weekends, and which hold up without them</span></h2>
+    <div class="wk" id="wkCards"></div>
+    <div class="chartbox" style="height:260px"><canvas id="c3"></canvas><div class="tip"></div></div>
+    <div class="legend"><span><i style="background:var(--we)"></i>Sat/Sun orders per day</span><span><i style="background:var(--wd)"></i>Mon–Fri orders per day</span><span class="note">Top 15 price points by net orders in the current filter</span></div>
+  </div>
+
+  <div class="card">
+    <div class="tabs" id="tabs">
+      <div class="tab on" data-t="bestcombo">★ Best pricing per PID (SP · Coin % · Cash)</div>
+      <div class="tab" data-t="combo">All SP · Coin · Cash combos</div>
+      <div class="tab" data-t="pp">Price-point scorecard</div>
+      <div class="tab" data-t="prod">Product summary & best price</div>
+      <div class="tab" data-t="best">Top Good price points</div>
+      <div class="tab" data-t="worst">Worst burners</div>
+    </div>
+    <div style="display:flex;gap:8px;align-items:center;margin-bottom:8px"><span class="note" id="tblNote"></span><button class="btn" id="exp" style="margin-left:auto">⬇ Export table (CSV)</button></div>
+    <div class="tbl" id="tbl"></div>
+    <div class="pager" id="pager"></div>
+  </div>
+  <p class="note">Pricing formulas: Selling price = <b>selling_price</b> column · Coin used per unit = coins_used ÷ quantity (for RTO/RVP rows where coins_used is blank it is rebuilt as selling_price × quantity − GMV, which matches coins_used exactly on every other row) · <b>Coin % = coin used ÷ selling price</b> · <b>Cash = selling price − coin used</b>. A “combo” is one PID at one selling price with one coin amount. <b>DRR = net orders ÷ days live</b> (days with orders at that combo), so combos live for only a few days are compared fairly. The best combo per PID has the highest DRR among combos whose CM% and burn/order are at least Average (not in the worst zone) with ≥ min orders; if DRRs are within the “similar DRR” % the better CM% wins.</p>
+  <p class="note">Notes: “Days live” counts dates with at least one order at that price. Elasticity is the slope of log(orders/day) vs log(price) across a product's price points (−1.5 means a 10% price cut brings ~15% more orders/day). Uploading a new file deletes all previous data from the dashboard and shows only the new file.</p>
+</div>
+
+<script id="seed" type="application/json">null</script>
+<script>
+/* ===== CORE: xlsx/csv parser + aggregator ===== */
+const Core = (() => {
+  const td = new TextDecoder();
+  const colIdx = s => { let n = 0; for (let i = 0; i < s.length; i++) n = n * 26 + (s.charCodeAt(i) - 64); return n - 1; };
+  const decodeXml = s => s.indexOf('&') < 0 ? s : s.replace(/&(#x[0-9a-fA-F]+|#\d+|lt|gt|amp|quot|apos);/g, (m, e) =>
+    e === 'lt' ? '<' : e === 'gt' ? '>' : e === 'amp' ? '&' : e === 'quot' ? '"' : e === 'apos' ? "'" :
+    e[1] === 'x' ? String.fromCodePoint(parseInt(e.slice(2), 16)) : String.fromCodePoint(parseInt(e.slice(1), 10)));
+
+  function readZip(buf) {
+    const dv = new DataView(buf); let i = buf.byteLength - 22;
+    while (i >= 0 && dv.getUint32(i, true) !== 0x06054b50) i--;
+    if (i < 0) throw new Error('Not a valid .xlsx file');
+    const n = dv.getUint16(i + 10, true); let p = dv.getUint32(i + 16, true); const ent = {};
+    for (let k = 0; k < n; k++) {
+      if (dv.getUint32(p, true) !== 0x02014b50) break;
+      const method = dv.getUint16(p + 10, true), csize = dv.getUint32(p + 20, true);
+      const nl = dv.getUint16(p + 28, true), el = dv.getUint16(p + 30, true), cl = dv.getUint16(p + 32, true);
+      const lho = dv.getUint32(p + 42, true);
+      const name = td.decode(new Uint8Array(buf, p + 46, nl));
+      ent[name] = { method, csize, lho }; p += 46 + nl + el + cl;
+    }
+    return ent;
+  }
+  function entryStream(buf, e) {
+    const dv = new DataView(buf);
+    const start = e.lho + 30 + dv.getUint16(e.lho + 26, true) + dv.getUint16(e.lho + 28, true);
+    const bytes = new Uint8Array(buf, start, e.csize);
+    let s = new Blob([bytes]).stream();
+    if (e.method === 8) s = s.pipeThrough(new DecompressionStream('deflate-raw'));
+    return s.pipeThrough(new TextDecoderStream());
+  }
+  async function entryText(buf, e) {
+    const r = entryStream(buf, e).getReader(); const parts = [];
+    for (;;) { const { done, value } = await r.read(); if (done) break; parts.push(value); }
+    return parts.join('');
+  }
+  const norm = t => t.replace(/^\/+/, '').replace(/^(?!xl\/)/, 'xl/');
+
+  async function xlsxRows(buf, onRow, onProgress) {
+    const ent = readZip(buf);
+    let sst = [];
+    const sstName = Object.keys(ent).find(k => /^xl\/sharedStrings\.xml$/i.test(k));
+    if (sstName) {
+      const t = await entryText(buf, ent[sstName]);
+      const re = /<si>([\s\S]*?)<\/si>/g, tre = /<t(?:\s[^>]*)?>([\s\S]*?)<\/t>/g; let m;
+      while ((m = re.exec(t))) {
+        const inner = m[1].replace(/<rPh[\s\S]*?<\/rPh>/g, ''); let s = '', x; tre.lastIndex = 0;
+        while ((x = tre.exec(inner))) s += x[1];
+        sst.push(decodeXml(s));
+      }
+    }
+    // sheet order from workbook
+    let sheets = [];
+    try {
+      const wb = await entryText(buf, ent['xl/workbook.xml']);
+      const rels = await entryText(buf, ent['xl/_rels/workbook.xml.rels']);
+      const relMap = {}; rels.replace(/<Relationship\b[^>]*>/g, r => {
+        const id = (r.match(/\bId="([^"]+)"/) || [])[1], tg = (r.match(/\bTarget="([^"]+)"/) || [])[1];
+        if (id && tg) relMap[id] = norm(tg); return r; });
+      wb.replace(/<sheet\b[^>]*>/g, s => {
+        const name = decodeXml((s.match(/\bname="([^"]*)"/) || [])[1] || '');
+        const rid = (s.match(/\br:id="([^"]+)"/) || s.match(/\bid="([^"]+)"/) || [])[1];
+        if (relMap[rid]) sheets.push({ name, path: relMap[rid] }); return s; });
+    } catch (e) {}
+    if (!sheets.length) sheets = Object.keys(ent).filter(k => /^xl\/worksheets\/sheet\d+\.xml$/.test(k)).sort().map(p => ({ name: p, path: p }));
+    const total = sheets.reduce((a, s) => a + (ent[s.path] ? 1 : 0), 0);
+    for (const sh of sheets) {
+      const e = ent[sh.path]; if (!e) continue;
+      let accepted = null; // null = header not yet seen
+      const reader = entryStream(buf, e).getReader(); let buf2 = '';
+      const cellRe = /<c\b([^>]*?)(?:\/>|>([\s\S]*?)<\/c>)/g, rowRe = /<row\b[^>]*?(?:\/>|>([\s\S]*?)<\/row>)/g;
+      let rowsDone = 0, stop = false;
+      const handleRows = chunk => {
+        rowRe.lastIndex = 0; let rm;
+        while ((rm = rowRe.exec(chunk))) {
+          const body = rm[1] || ''; const row = []; let cm, last = -1; cellRe.lastIndex = 0;
+          while ((cm = cellRe.exec(body))) {
+            const at = cm[1]; const rr = at.match(/\br="([A-Z]+)\d+"/); const ci = rr ? colIdx(rr[1]) : last + 1; last = ci;
+            const inner = cm[2]; if (inner == null) continue;
+            const t = (at.match(/\bt="([^"]+)"/) || [])[1];
+            let v;
+            if (t === 'inlineStr') { let s = '', x; const tr = /<t(?:\s[^>]*)?>([\s\S]*?)<\/t>/g; while ((x = tr.exec(inner))) s += x[1]; v = decodeXml(s); }
+            else { const vm = inner.match(/<v>([\s\S]*?)<\/v>/); if (!vm) continue; v = vm[1];
+              if (t === 's') v = sst[+v]; else if (t === 'str' || t === 'e') v = decodeXml(v); else if (t === 'b') v = v === '1'; else v = +v; }
+            row[ci] = v;
+          }
+          const r = onRow(row, accepted === null); if (accepted === null) { accepted = r !== false; if (!accepted) { stop = true; return; } }
+          rowsDone++;
+        }
+      };
+      for (;;) {
+        const { done, value } = await reader.read(); if (done) break;
+        buf2 += value; const end = buf2.lastIndexOf('</row>');
+        if (end >= 0) { handleRows(buf2.slice(0, end + 6)); buf2 = buf2.slice(end + 6); if (onProgress) onProgress(rowsDone); }
+        if (stop) { try { reader.cancel(); } catch (e) {} break; }
+      }
+      if (!stop) handleRows(buf2);
+      if (accepted) return sh.name;
+    }
+    throw new Error('No sheet with the required columns (selling_price, net_orders, net_gmv, CM, order_date, product_id) was found.');
+  }
+
+  function csvRows(text, onRow) {
+    let i = 0, row = [], f = '', q = false, first = true; const n = text.length;
+    const push = () => { row.push(f); f = ''; };
+    const end = () => { push(); if (row.length > 1 || row[0] !== '') { const r = onRow(row, first); if (first && r === false) throw new Error('CSV is missing required columns.'); first = false; } row = []; };
+    for (; i < n; i++) { const c = text[i];
+      if (q) { if (c === '"') { if (text[i + 1] === '"') { f += '"'; i++; } else q = false; } else f += c; }
+      else if (c === '"') q = true; else if (c === ',') push(); else if (c === '\n') end(); else if (c !== '\r') f += c; }
+    if (f !== '' || row.length) end();
+  }
+
+  const MON = { jan: 1, feb: 2, mar: 3, apr: 4, may: 5, jun: 6, jul: 7, aug: 8, sep: 9, oct: 10, nov: 11, dec: 12 };
+  const serial = (y, m, d) => Math.round((Date.UTC(y, m - 1, d) - Date.UTC(1899, 11, 30)) / 864e5);
+  function toSerial(v) {
+    if (v == null || v === '') return null;
+    if (typeof v === 'number') return Math.floor(v);
+    const s = String(v).trim(); let m;
+    if (/^\d+(\.\d+)?$/.test(s)) return Math.floor(+s);
+    if ((m = s.match(/^(\d{4})[-\/.](\d{1,2})[-\/.](\d{1,2})/))) return serial(+m[1], +m[2], +m[3]);
+    if ((m = s.match(/^(\d{1,2})[-\/.](\d{1,2})[-\/.](\d{2,4})/))) { let y = +m[3]; if (y < 100) y += 2000; return serial(y, +m[2], +m[1]); } // dd-mm-yyyy (India)
+    if ((m = s.match(/^(\d{1,2})[-\s]([A-Za-z]{3})[A-Za-z]*[-\s,]*(\d{2,4})/))) { let y = +m[3]; if (y < 100) y += 2000; return serial(y, MON[m[2].toLowerCase()] || 1, +m[1]); }
+    const t = Date.parse(s); if (!isNaN(t)) { const d = new Date(t); return serial(d.getFullYear(), d.getMonth() + 1, d.getDate()); }
+    return null;
+  }
+  const num = v => { if (v == null || v === '' || v === true || v === false) return 0; const x = typeof v === 'number' ? v : parseFloat(String(v).replace(/[,₹\s]/g, '')); return isFinite(x) ? x : 0; };
+  const str = v => v == null ? '' : String(v).trim();
+
+  // Build aggregated dataset from row iterator
+  function makeAggregator() {
+    const H = {}; const P = [], pIdx = new Map(), R = new Map(); let rows = 0, skipped = 0;
+    const need = ['order_date', 'product_id', 'selling_price', 'net_orders', 'net_gmv', 'cm'];
+    return {
+      onRow(row, isHeader) {
+        if (isHeader) {
+          row.forEach((h, i) => { if (h != null) { const k = String(h).trim().toLowerCase(); if (!(k in H)) H[k] = i; } });
+          return need.every(k => k in H);
+        }
+        const g = k => H[k] == null ? undefined : row[H[k]];
+        const d = toSerial(g('order_date')); const pid = str(g('product_id'));
+        if (d == null || !pid) { skipped++; return; }
+        rows++;
+        const upc = str(g('upc')); const key = pid + '\u0001' + upc;
+        let pi = pIdx.get(key);
+        if (pi == null) { pi = P.length; pIdx.set(key, pi); P.push([pid, upc, str(g('product_title')), str(g('brand_name')), str(g('l2_name')), 0]); }
+        const mrp = num(g('mrp')); if (mrp > P[pi][5]) P[pi][5] = mrp;
+        const price = Math.round(num(g('selling_price')) * 100) / 100;
+        // Coin per unit: coins_used ÷ quantity. When coins_used is blank (RTO/RVP rows), derive it as selling_price × qty − GMV
+        const qty = num(g('quantity')) || 1; const cRaw = g('coins_used');
+        let coins = (cRaw == null || cRaw === '') ? (H.gmv != null && g('gmv') !== '' && g('gmv') != null ? Math.max(0, price * qty - num(g('gmv'))) : 0) : num(cRaw);
+        const coinU = Math.round(coins / qty);
+        const rk = pi + '|' + price + '|' + coinU + '|' + d;
+        let r = R.get(rk); if (!r) { r = [pi, price, d, 0, 0, 0, 0, 0, 0, 0, coinU]; R.set(rk, r); }
+        const st = str(g('order_status')).toUpperCase();
+        r[3] += H.gross_orders != null ? num(g('gross_orders')) : 1;
+        r[4] += num(g('net_orders')); r[5] += num(g('net_gmv')); r[6] += num(g('cm')); r[7] += num(g('coins_used'));
+        if (st === 'RTO') r[8]++; else if (st === 'RVP') r[9]++;
+      },
+      result(file, sheet) {
+        const Ra = [...R.values()].map(r => { r[5] = Math.round(r[5] * 100) / 100; r[6] = Math.round(r[6] * 100) / 100; r[7] = Math.round(r[7] * 100) / 100; return r; });
+        return { file, sheet, rows, skipped, loadedAt: new Date().toISOString(), P, R: Ra };
+      }
+    };
+  }
+  async function parseFile(name, buf, onProgress) {
+    const agg = makeAggregator(); let sheet = '';
+    if (/\.csv$/i.test(name)) { csvRows(new TextDecoder().decode(buf), agg.onRow); sheet = 'CSV'; }
+    else sheet = await xlsxRows(buf, agg.onRow, onProgress);
+    const res = agg.result(name, sheet);
+    if (!res.R.length) throw new Error('No data rows found in the file.');
+    return res;
+  }
+  return { parseFile };
+})();
+if (typeof module !== 'undefined') module.exports = Core;
+
+</script>
+<script>
+(() => {
+const $ = id => document.getElementById(id);
+const G = { cmG: -15, cmW: -25, buG: 100, buW: 175, veG: 1, veW: 0.5, min: 5, we: 20, tie: 10 };
+const GMAP = { gCmG: 'cmG', gCmW: 'cmW', gBuG: 'buG', gBuW: 'buW', gVeG: 'veG', gVeW: 'veW', gMin: 'min', gWe: 'we', gTie: 'tie' };
+let DATA = null, VIEW = null, tab = 'bestcombo', page = 0; const PS = 50;
+const sorts = { bestcombo: { k: 'pidNet', d: -1 }, combo: { k: 'net', d: -1 }, pp: { k: 'net', d: -1 }, prod: { k: 'net', d: -1 }, best: { k: 'opd', d: -1 }, worst: { k: 'cm', d: 1 } };
+
+// ---------- formatting ----------
+function fmtN(v) { v = Math.abs(v); if (v >= 1e7) return (v / 1e7).toFixed(2) + ' Cr'; if (v >= 1e5) return (v / 1e5).toFixed(2) + ' L'; return Math.round(v).toLocaleString('en-IN'); }
+const inr = v => (v < 0 ? '−' : '') + '₹' + fmtN(Math.abs(v));
+const n0 = v => v == null || !isFinite(v) ? '–' : Math.round(v).toLocaleString('en-IN');
+const n1 = v => v == null || !isFinite(v) ? '–' : (+v).toFixed(1);
+const n2 = v => v == null || !isFinite(v) ? '–' : (+v).toFixed(2);
+const pct = v => v == null || !isFinite(v) ? '–' : v.toFixed(1) + '%';
+const esc = s => String(s ?? '').replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
+const s2d = s => new Date((s - 25569) * 864e5);
+const s2iso = s => s2d(s).toISOString().slice(0, 10);
+const iso2s = v => v ? Math.round((Date.parse(v + 'T00:00:00Z') / 864e5) + 25569) : null;
+const s2lbl = s => { const d = s2d(s); return d.getUTCDate() + ' ' + 'Jan Feb Mar Apr May Jun Jul Aug Sep Oct Nov Dec'.split(' ')[d.getUTCMonth()]; };
+const dow = s => s2d(s).getUTCDay();
+
+// ---------- data load ----------
+function setData(d) {
+  DATA = d;
+  d.R.forEach(r => { if (r[10] == null) r[10] = 0; r[11] = (dow(r[2]) % 6 === 0) ? 1 : 0; }); // r[10] = coin per unit, r[11] = weekend flag (Sun=0, Sat=6)
+  let mn = Infinity, mx = -Infinity; d.R.forEach(r => { if (r[2] < mn) mn = r[2]; if (r[2] > mx) mx = r[2]; });
+  d.min = mn; d.max = mx; d.pidSet = new Set(d.P.map(p => p[0].toLowerCase())); d.upcSet = new Set(d.P.map(p => p[1].toLowerCase())); lastKey = null;
+  ['fUpc', 'fPid', 'fBrand', 'fL2'].forEach(i => delete $(i).dataset.auto);
+  const brands = [...new Set(d.P.map(p => p[3]).filter(Boolean))].sort(), l2 = [...new Set(d.P.map(p => p[4]).filter(Boolean))].sort();
+  $('fBrand').innerHTML = '<option value="">All brands</option>' + brands.map(b => `<option>${esc(b)}</option>`).join('');
+  $('fL2').innerHTML = '<option value="">All categories</option>' + l2.map(b => `<option>${esc(b)}</option>`).join('');
+  ['fPid', 'fUpc', 'fTitle'].forEach(i => $(i).value = ''); $('fVer').value = ''; $('fDay').value = 'all';
+  $('fFrom').value = s2iso(mn); $('fTo').value = s2iso(mx); $('fFrom').min = $('fTo').min = s2iso(mn); $('fFrom').max = $('fTo').max = s2iso(mx);
+  $('fileMeta').textContent = `${d.file}  ·  ${d.rows.toLocaleString('en-IN')} sub-orders  ·  ${s2lbl(mn)} – ${s2lbl(mx)} ${s2d(mx).getUTCFullYear()}  ·  ${d.P.length.toLocaleString('en-IN')} products  ·  loaded ${new Date(d.loadedAt).toLocaleString('en-IN')}`;
+  page = 0; render();
+}
+
+// ---------- filters ----------
+const splitList = v => v.split(/[,\n;]+/).map(s => s.trim().toLowerCase()).filter(Boolean);
+function matchList(val, list, ex) { if (!list.length) return true; val = val.toLowerCase(); return list.some(x => val === x) || list.some(x => x.length >= 3 && !(ex && ex.has(x)) && val.includes(x)); }
+function filteredProducts(skip) {
+  const pids = splitList($('fPid').value), upcs = splitList($('fUpc').value), br = $('fBrand').value, l2 = $('fL2').value, tt = $('fTitle').value.trim().toLowerCase();
+  const ok = new Uint8Array(DATA.P.length);
+  const pEx = new Set(pids.filter(x => DATA.pidSet.has(x))), uEx = new Set(upcs.filter(x => DATA.upcSet.has(x))); // typed an exact PID/UPC → match only that one
+  DATA.P.forEach((p, i) => {
+    if (skip !== 'pid' && !matchList(p[0], pids, pEx)) return;
+    if (skip !== 'upc' && !matchList(p[1], upcs, uEx)) return;
+    if (skip !== 'brand' && br && p[3] !== br) return; if (skip !== 'l2' && l2 && p[4] !== l2) return;
+    if (tt && !p[2].toLowerCase().includes(tt)) return;
+    ok[i] = 1;
+  });
+  return ok;
+}
+let lastKey = null;
+// Keep every filter aligned: PID <-> UPC auto-fill, Brand/Category options narrowed, date range = live range of the selection
+function syncPair(src) {
+  if (!DATA) return;
+  const [me, other, skip, col] = src === 'pid' ? ['fPid', 'fUpc', 'upc', 1] : ['fUpc', 'fPid', 'pid', 0];
+  ['fBrand', 'fL2'].forEach(i => { if ($(i).dataset.auto) { $(i).value = ''; delete $(i).dataset.auto; } }); // previous product's auto-picked brand/category must not block the new one
+  const v = $(me).value.trim(), o = $(other);
+  if (!v) { if (o.dataset.auto) { o.value = ''; delete o.dataset.auto; } return; }
+  if (o.value.trim() && !o.dataset.auto) return; // user typed the other field — respect it
+  const ok = filteredProducts(skip); const vals = [...new Set(DATA.P.filter((p, i) => ok[i]).map(p => p[col]).filter(Boolean))];
+  if (vals.length >= 1 && vals.length <= 5) { o.value = vals.join(', '); o.dataset.auto = '1'; } else if (o.dataset.auto) { o.value = ''; delete o.dataset.auto; }
+}
+function rebuildSelect(id, idx, skip, allLabel) {
+  const ok = filteredProducts(skip), el = $(id); const vals = [...new Set(DATA.P.filter((p, i) => ok[i]).map(p => p[idx]).filter(Boolean))].sort();
+  const narrowed = $('fPid').value.trim() || $('fUpc').value.trim() || $('fTitle').value.trim();
+  let v = vals.includes(el.value) ? el.value : '', auto = false;
+  if (narrowed && vals.length === 1 && (!v || el.dataset.auto)) { v = vals[0]; auto = true; } else if (!narrowed && el.dataset.auto) v = '';
+  el.innerHTML = `<option value="">${allLabel} (${vals.length})</option>` + vals.map(b => `<option value="${esc(b)}">${esc(b)}</option>`).join(''); el.value = v;
+  if (auto) el.dataset.auto = '1'; else if (!v || !narrowed) delete el.dataset.auto;
+}
+function alignFilters() {
+  rebuildSelect('fBrand', 3, 'brand', 'All brands'); rebuildSelect('fL2', 4, 'l2', 'All categories');
+  const ok = filteredProducts(); let mn = Infinity, mx = -Infinity; DATA.R.forEach(r => { if (ok[r[0]]) { if (r[2] < mn) mn = r[2]; if (r[2] > mx) mx = r[2]; } });
+  if (!isFinite(mn)) { mn = DATA.min; mx = DATA.max; }
+  const key = [$('fPid').value, $('fUpc').value, $('fBrand').value, $('fL2').value, $('fTitle').value].join('|');
+  const f = $('fFrom'), t = $('fTo'); f.min = t.min = s2iso(mn); f.max = t.max = s2iso(mx);
+  if (key !== lastKey) { f.value = s2iso(mn); t.value = s2iso(mx); lastKey = key; } // new selection → show its full live range
+  else { const a = iso2s(f.value), b = iso2s(t.value); if (a == null || a < mn || a > mx) f.value = s2iso(mn); if (b == null || b > mx || b < mn) t.value = s2iso(mx); }
+}
+function refreshLists() {
+  const a = filteredProducts('pid'), b = filteredProducts('upc'); let h1 = '', h2 = '', c1 = 0, c2 = 0;
+  DATA.P.forEach((p, i) => { if (a[i] && c1 < 3000) { h1 += `<option value="${esc(p[0])}">${esc(p[1])} · ${esc(p[2].slice(0, 60))}</option>`; c1++; }
+    if (b[i] && c2 < 3000) { h2 += `<option value="${esc(p[1])}">${esc(p[0])} · ${esc(p[2].slice(0, 60))}</option>`; c2++; } });
+  $('dlPid').innerHTML = h1; $('dlUpc').innerHTML = h2;
+}
+
+// ---------- core analytics ----------
+const acc = () => ({ g: 0, n: 0, gmv: 0, cm: 0, co: 0, rto: 0, rvp: 0, cu: 0, sp: 0, days: new Set() });
+function add(a, r) { a.g += r[3]; a.n += r[4]; a.gmv += r[5]; a.cm += r[6]; a.co += r[7]; a.rto += r[8]; a.rvp += r[9]; a.cu += r[10] * r[3]; a.sp += r[1] * r[3]; if (r[3] > 0) a.days.add(r[2]); }
+function fin(a) {
+  if (a.days.size) { let f = Infinity, l = -Infinity; a.days.forEach(d => { if (d < f) f = d; if (d > l) l = d; }); a.f = f; a.l = l; } else { a.f = a.l = null; }
+  a.acu = a.g ? a.cu / a.g : null; a.acoinp = a.sp ? a.cu / a.sp * 100 : null; a.asp = a.g ? a.sp / a.g : null;
+  a.d = a.days.size; a.opd = a.d ? a.n / a.d : 0; a.cmp = a.gmv ? a.cm / a.gmv * 100 : null; a.bpo = a.n ? -a.cm / a.n : null;
+  a.cog = a.gmv ? a.co / a.gmv * 100 : null; a.ret = a.g ? (a.rto + a.rvp) / a.g * 100 : null; return a;
+}
+function verdict(a, idx) {
+  if (a.n < G.min) return { v: 'Low', checks: [], why: `Only ${n0(a.n)} net orders (< ${G.min}) — not enough data` };
+  const z = (val, good, worst, higherBetter) => val == null ? 'na' : higherBetter ? (val >= good ? 'good' : val < worst ? 'worst' : 'avg') : (val <= good ? 'good' : val > worst ? 'worst' : 'avg');
+  const checks = [
+    { k: 'CM%', s: z(a.cmp, G.cmG, G.cmW, true), t: pct(a.cmp) },
+    { k: 'Burn/order', s: z(a.bpo, G.buG, G.buW, false), t: a.bpo == null ? '–' : (a.bpo < 0 ? '+₹' + n0(-a.bpo) + ' profit' : '₹' + n0(a.bpo)) },
+    { k: 'Velocity', s: idx == null ? 'na' : z(idx, G.veG, G.veW, true), t: idx == null ? 'single price' : n2(idx) + '×' }
+  ];
+  const app = checks.filter(c => c.s !== 'na');
+  const v = app.some(c => c.s === 'worst') ? 'Worst' : app.every(c => c.s === 'good') ? 'Good' : 'Average';
+  return { v, checks };
+}
+function compute() {
+  const okP = filteredProducts(); const from = iso2s($('fFrom').value) ?? DATA.min, to = iso2s($('fTo').value) ?? DATA.max; const mode = $('fDay').value;
+  const recs = DATA.R.filter(r => okP[r[0]] && r[2] >= from && r[2] <= to);
+  const inMode = r => mode === 'all' || (mode === 'we' ? r[11] : !r[11]);
+  const sel = mode === 'all' ? 'A' : mode === 'we' ? 'E' : 'W';
+  const [pps, prods] = groupScore(recs, r => r[0] + '|' + r[1], r => ({ pi: r[0], price: r[1] }), sel);
+  const [cps, cprods] = groupScore(recs, r => r[0] + '|' + r[1] + '|' + r[10], r => ({ pi: r[0], price: r[1], coin: r[10] }), sel);
+  // Verdict filter: keep only price points (product x selling price) with the chosen verdict, then rebuild every number from their orders
+  const fv = $('fVer').value;
+  const keep = fv ? new Set(pps.filter(p => p[sel].V.v === fv).map(p => p.pi + '|' + p.price)) : null;
+  const recsF = keep ? recs.filter(r => keep.has(r[0] + '|' + r[1])) : recs;
+  const K = acc(), daily = new Map();
+  for (const r of recsF) if (inMode(r)) { add(K, r); let d = daily.get(r[2]); if (!d) daily.set(r[2], d = acc()); add(d, r); }
+  fin(K);
+  const combos = comboRows(cps, cprods, sel).filter(r => !fv || r.V === fv);
+  const rows = pps.map(p => {
+    const P = DATA.P[p.pi], m = p[sel], E = p.E, W = p.W;
+    const lift = W.opd > 0 ? (E.opd / W.opd - 1) * 100 : (E.opd > 0 ? Infinity : null);
+    const drv = (E.d === 0 && W.d === 0) ? 'st' : E.d === 0 ? 'wdonly' : W.d === 0 ? 'weonly' : lift >= G.we ? 'we' : lift <= -G.we ? 'wd' : 'st';
+    const row = { p, pid: P[0], upc: P[1], title: P[2], brand: P[3], mrp: P[5], price: p.price, disc: P[5] > 0 ? (1 - p.price / P[5]) * 100 : null,
+      d: m.d, lf: m.f, ll: m.l, net: m.n, opd: m.opd, idx: m.idx, gmv: m.gmv, cm: m.cm, cmp: m.cmp, bpo: m.bpo, co: m.co, cog: m.cog, ret: m.ret,
+      acoin: m.acu, acoinp: m.acu != null && p.price ? m.acu / p.price * 100 : null, acash: m.acu != null ? p.price - m.acu : null,
+      weOpd: E.opd, wdOpd: W.opd, lift, drv, V: m.V.v, VA: p.A.V.v, VW: p.W.V.v, VE: p.E.V.v, checks: m.V.checks, best: !!p.best, worstP: !!p.worstP, nPrices: prods.get(p.pi).length };
+    row.remark = remark(row, m, p); return row;
+  });
+  const vc = { Good: 0, Average: 0, Worst: 0, Low: 0 }; rows.forEach(r => vc[r.V]++);
+  { const el = $('fVer'), cur = el.value, tot = rows.length; el.innerHTML = `<option value="">All verdicts (${tot})</option>` + [['Good', 'Good'], ['Average', 'Average'], ['Worst', 'Worst'], ['Low', 'Low data']].map(([k, l]) => `<option value="${k}">${l} (${vc[k]})</option>`).join(''); el.value = cur; }
+  return { K, daily, rows: fv ? rows.filter(r => r.V === fv) : rows, prods, sel, mode, recs: recsF, combos, fv };
+}
+const RANK = { Good: 3, Average: 2, Worst: 1, Low: 0 };
+// Group records by a key (price point or SP+coin combo), split all / Sat-Sun / Mon-Fri, then score within each product
+function groupScore(recs, keyFn, mk, sel) {
+  const map = new Map();
+  for (const r of recs) { const k = keyFn(r); let o = map.get(k); if (!o) map.set(k, o = Object.assign(mk(r), { A: acc(), E: acc(), W: acc() })); add(o.A, r); add(r[11] ? o.E : o.W, r); }
+  const list = [...map.values()]; list.forEach(o => { fin(o.A); fin(o.E); fin(o.W); });
+  const prods = new Map(); list.forEach(o => { let g = prods.get(o.pi); if (!g) prods.set(o.pi, g = []); g.push(o); });
+  for (const [, grp] of prods) {
+    for (const b of ['A', 'E', 'W']) {
+      const live = grp.filter(o => o[b].d > 0); const avg = live.length ? live.reduce((s, o) => s + o[b].opd, 0) / live.length : 0;
+      const tot = grp.reduce((s, o) => s + o[b].n, 0);
+      grp.forEach(o => { o[b].idx = live.length > 1 && avg > 0 && o[b].d > 0 ? o[b].opd / avg : null; o[b].share = tot ? o[b].n / tot * 100 : null; o[b].V = verdict(o[b], o[b].idx); });
+    }
+    // BEST PRICING = highest DRR (net orders ÷ days live) among combos whose CM% and burn/order are at least Average (not in the worst zone)
+    // and that have >= min orders. If DRRs are within G.tie % of the top DRR they count as similar and the better CM% (then lower burn) wins.
+    const zcm = a => a.cmp == null ? 'na' : a.cmp >= G.cmG ? 'good' : a.cmp < G.cmW ? 'worst' : 'avg';
+    const zbu = a => a.bpo == null ? 'na' : a.bpo <= G.buG ? 'good' : a.bpo > G.buW ? 'worst' : 'avg';
+    const enough = grp.filter(o => o[sel].n >= G.min && o[sel].d > 0);
+    const elig = enough.filter(o => { const c = zcm(o[sel]), b = zbu(o[sel]); return c !== 'worst' && c !== 'na' && b !== 'worst'; });
+    let best = null;
+    if (elig.length) {
+      const byDrr = [...elig].sort((x, y) => y[sel].opd - x[sel].opd); const top = byDrr[0];
+      const near = byDrr.filter(o => o[sel].opd >= top[sel].opd * (1 - G.tie / 100));
+      best = near.sort((x, y) => (y[sel].cmp - x[sel].cmp) || ((x[sel].bpo ?? 0) - (y[sel].bpo ?? 0)))[0];
+      best.pick = { mode: 'ok', top, nearN: near.length };
+    } else if (enough.length) { best = [...enough].sort((x, y) => (y[sel].cmp ?? -1e9) - (x[sel].cmp ?? -1e9))[0]; best.pick = { mode: 'fallback' }; }
+    if (best) {
+      best.best = true;
+      best.pick.skipped = enough.filter(o => o[sel].opd > best[sel].opd && !elig.includes(o)).sort((x, y) => y[sel].opd - x[sel].opd)[0] || null;
+      best.pick.zc = zcm; best.pick.zb = zbu;
+      const rest = enough.filter(o => o !== best);
+      if (rest.length) rest.sort((x, y) => (x[sel].cmp ?? 1e9) - (y[sel].cmp ?? 1e9) || x[sel].opd - y[sel].opd)[0].worstP = true;
+    }
+  }
+  return [list, prods];
+}
+function comboRows(cps, cprods, sel) {
+  return cps.map(o => {
+    const P = DATA.P[o.pi], m = o[sel];
+    const r = { p: o, pid: P[0], upc: P[1], title: P[2], brand: P[3], price: o.price, coin: o.coin, coinp: o.price ? o.coin / o.price * 100 : null, cash: o.price - o.coin,
+      d: m.d, lf: m.f, ll: m.l, net: m.n, opd: m.opd, idx: m.idx, share: m.share, gmv: m.gmv, cm: m.cm, cmp: m.cmp, bpo: m.bpo, ret: m.ret,
+      weOpd: o.E.opd, wdOpd: o.W.opd, V: m.V.v, VA: o.A.V.v, VW: o.W.V.v, checks: m.V.checks, best: !!o.best, worstP: !!o.worstP, nC: cprods.get(o.pi).length };
+    const t = `SP ₹${n0(r.price)} · coin ₹${n0(r.coin)} (${pct(r.coinp)}) · cash ₹${n0(r.cash)}`; const out = [];
+    if (r.best) out.push(`★ Best pricing for this PID (of ${r.nC} combos): ${t}.`); else if (r.worstP) out.push(`Weakest pricing for this PID (of ${r.nC} combos).`);
+    if (r.V === 'Low') out.push(`Only ${n0(r.net)} net orders — not enough to judge.`);
+    else out.push(`${VL(r.V)}: ${n0(r.net)} orders (${pct(r.share)} of PID), ${n2(r.opd)}/day${r.idx != null ? ' (' + n2(r.idx) + '× PID avg)' : ''}, CM% ${pct(r.cmp)}, burn ₹${n0(r.bpo)}/order.`);
+    if (r.VA === 'Good' && r.VW === 'Good') out.push('Holds Good without Sat/Sun.'); else if (r.VA === 'Good' && r.VW !== 'Low') out.push(`Good only with Sat/Sun (Mon–Fri: ${VL(r.VW)}).`);
+    r.remark = out.join(' '); return r;
+  });
+}
+function bestComboRows() {
+  const by = new Map(); VIEW.combos.forEach(r => { let a = by.get(r.p.pi); if (!a) by.set(r.p.pi, a = []); a.push(r); });
+  const out = [];
+  for (const [, list] of by) {
+    const best = list.find(r => r.best) || [...list].sort((x, y) => y.net - x.net)[0];
+    const worst = list.find(r => r.worstP); const tot = list.reduce((s, r) => s + r.net, 0);
+    const pk = best.p.pick, combo = r => `SP ₹${n0(r.price)} · coin ${pct(r.coinp)} (₹${n0(r.coin)}) · cash ₹${n0(r.cash)}`;
+    let rec;
+    if (!pk) rec = `Not enough orders on any SP/coin combo (needs ≥ ${G.min} net orders) — most orders so far at ${combo(best)}.`;
+    else if (pk.mode === 'ok') {
+      rec = `★ Best pricing: ${combo(best)} → DRR ${n2(best.opd)} orders/day (${n0(best.net)} orders over ${best.d} live day${best.d > 1 ? 's' : ''}), CM% ${pct(best.cmp)}, burn ₹${n0(best.bpo)}/order.`;
+      if (pk.nearN > 1) rec += ` ${pk.nearN} combos had similar DRR (within ${G.tie}%) — picked the one with the best CM%.`;
+      if (pk.skipped) { const s = list.find(r => r.p === pk.skipped); if (s) rec += ` Skipped ${combo(s)} (DRR ${n2(s.opd)}/day) because ${s.cmp != null && s.cmp < G.cmW ? 'CM% ' + pct(s.cmp) + ' is below ' + G.cmW + '%' : 'burn ₹' + n0(s.bpo) + '/order is above ₹' + G.buW}.`; }
+    } else rec = `No combo reaches at least Average CM% (≥ ${G.cmW}%) with acceptable burn; least-bad is ${combo(best)} at CM% ${pct(best.cmp)}, DRR ${n2(best.opd)}/day.`;
+    if (worst) rec += ` Avoid ${combo(worst)} (CM% ${pct(worst.cmp)}, DRR ${n2(worst.opd)}/day).`;
+    out.push(Object.assign({}, best, { nC: list.length, pidNet: tot, wSp: worst ? worst.price : null, wCoinp: worst ? worst.coinp : null, wCash: worst ? worst.cash : null, wCmp: worst ? worst.cmp : null, remark: rec }));
+  }
+  return out;
+}
+const VL = v => v === 'Low' ? 'Low data' : v;
+function remark(r, m, p) {
+  const out = [];
+  if (r.best) out.push(`★ Best price for this product (of ${r.nPrices}) — highest DRR with CM% & burn at least Average.`);
+  if (r.worstP) out.push(`Weakest price for this product (of ${r.nPrices}).`);
+  if (r.V === 'Low') out.push(m.V.why + '.');
+  else if (r.V === 'Good') out.push(`Good: ${n1(r.opd)} orders/day${r.idx != null ? ` (${n2(r.idx)}× product avg)` : ''}, CM% ${pct(r.cmp)}, burn ₹${n0(r.bpo)}/order — all guardrails pass.`);
+  else {
+    const bad = r.checks.filter(c => c.s === 'worst'), mid = r.checks.filter(c => c.s === 'avg');
+    const desc = c => { const w = c.s === 'worst';
+      return c.k === 'CM%' ? `CM% ${c.t} (${w ? 'below worst limit ' + G.cmW : 'below good limit ' + G.cmG}%)` : c.k === 'Burn/order' ? `burn ${c.t}/order (${w ? 'above worst limit ₹' + G.buW : 'above good limit ₹' + G.buG})` : `velocity ${c.t} (${w ? 'below ' + G.veW : 'below ' + G.veG}× product avg)`; };
+    if (r.V === 'Worst') out.push('Worst: ' + bad.map(desc).join('; ') + '.');
+    else out.push('Average: ' + mid.map(desc).join('; ') + '.');
+  }
+  if (r.drv === 'we') out.push(`Weekend-driven: Sat/Sun ${n1(r.weOpd)}/day vs Mon–Fri ${n1(r.wdOpd)}/day (+${n0(r.lift)}%).`);
+  else if (r.drv === 'wd') out.push(`Weekday-driven: Mon–Fri ${n1(r.wdOpd)}/day vs Sat/Sun ${n1(r.weOpd)}/day (${n0(r.lift)}%).`);
+  else if (r.drv === 'weonly') out.push('Sold only on Sat/Sun.');
+  else if (r.drv === 'wdonly') out.push('Sold only Mon–Fri.');
+  else if (p.E.d && p.W.d) out.push('Steady across the week.');
+  if (r.VA === 'Good' && r.VW !== 'Good' && r.VW !== 'Low') out.push(`Good only with Sat/Sun — without weekends it is ${VL(r.VW)}.`);
+  else if (r.VA !== 'Good' && r.VA !== 'Low' && r.VW === 'Good') out.push('Good on Mon–Fri; weekends pull it down.');
+  else if (r.VA === 'Good' && r.VW === 'Good') out.push('Holds Good even without Sat/Sun.');
+  return out.join(' ');
+}
+function elasticity(list, b) {
+  const pts = list.filter(p => p[b].d > 0 && p[b].opd > 0 && p.price > 0);
+  if (pts.length < 2) return null;
+  const xs = pts.map(p => Math.log(p.price)), ys = pts.map(p => Math.log(p[b].opd));
+  const mx = xs.reduce((a, c) => a + c) / xs.length, my = ys.reduce((a, c) => a + c) / ys.length;
+  let sxy = 0, sxx = 0; xs.forEach((x, i) => { sxy += (x - mx) * (ys[i] - my); sxx += (x - mx) ** 2; });
+  return sxx > 0 ? sxy / sxx : null;
+}
+const elLbl = e => e == null ? '–' : e <= -1 ? 'Elastic (price-sensitive)' : e < 0 ? 'Inelastic (mild)' : 'No price sensitivity';
+
+// ---------- render ----------
+function render() {
+  if (!DATA) return;
+  alignFilters(); refreshLists();
+  VIEW = compute(); const { K, rows, mode } = VIEW;
+  $('grSum').textContent = `CM% good ≥ ${G.cmG}% / worst < ${G.cmW}% · burn good ≤ ₹${G.buG} / worst > ₹${G.buW} · velocity ≥ ${G.veG}× / < ${G.veW}× · min ${G.min} orders`;
+  const cnt = v => rows.filter(r => r.V === v).length;
+  const ml = mode === 'all' ? 'All days' : mode === 'we' ? 'Sat & Sun' : 'Mon–Fri';
+  const weK = acc(), wdK = acc(); VIEW.recs.forEach(r => add(r[11] ? weK : wdK, r)); fin(weK); fin(wdK);
+  $('kpis').innerHTML = [
+    ['Net orders', n0(K.n), `${ml}${VIEW.fv ? ' · ' + VL(VIEW.fv) + ' only' : ''} · ${n0(K.g)} gross`],
+    ['Net GMV', inr(K.gmv), 'Σ net_gmv'],
+    ['Avg selling price', K.asp == null ? '–' : '₹' + n0(K.asp), 'from selling_price column'],
+    ['Avg coin % · cash', pct(K.acoinp), K.acu == null ? '' : `coin ₹${n0(K.acu)}/unit · cash ₹${n0(K.asp - K.acu)}`],
+    ['CM (Burn)', `<span class="${K.cm < 0 ? 'neg' : 'pos'}">${inr(K.cm)}</span>`, 'Σ CM'],
+    ['CM %', `<span class="${(K.cmp ?? 0) < 0 ? 'neg' : 'pos'}">${pct(K.cmp)}</span>`, 'Σ CM ÷ Σ Net GMV'],
+    ['Burn / net order', K.bpo == null ? '–' : '₹' + n0(K.bpo), '−Σ CM ÷ Σ net orders'],
+    ['Coins burn', inr(K.co), pct(K.cog) + ' of net GMV'],
+    ['Return % (RTO+RVP)', pct(K.ret), `${n0(K.rto)} RTO · ${n0(K.rvp)} RVP`],
+    ['Sat/Sun share', pct((weK.n / ((weK.n + wdK.n) || 1)) * 100), `${n1(weK.d ? weK.n / weK.d : 0)}/day Sat-Sun vs ${n1(wdK.d ? wdK.n / wdK.d : 0)}/day Mon-Fri`],
+    ['Price points', n0(rows.length), `<span class="mini">${cnt('Good')} Good</span><span class="mini">${cnt('Average')} Avg</span><span class="mini">${cnt('Worst')} Worst</span><span class="mini">${cnt('Low')} Low</span>`]
+  ].map(([l, v, s], i) => `<div class="kpi k${i}"><div class="ic"><svg viewBox="0 0 24 24">${ICONS[KICON[i]]}</svg></div><div class="l">${l}</div><div class="v">${v}</div><div class="s">${s}</div></div>`).join('');
+  renderCharts(); renderCoin(); renderDonuts(weK, wdK); renderWeekend(); renderTable();
+}
+// ---------- coin % & cash bands ----------
+const CBANDS = [[0, 0.0001, '0% (no coin)'], [0.0001, 5, '0–5%'], [5, 10, '5–10%'], [10, 15, '10–15%'], [15, 20, '15–20%'], [20, 25, '20–25%'], [25, 30, '25–30%'], [30, 40, '30–40%'], [40, 1e9, '40%+']];
+const KBANDS = [0, 100, 150, 200, 300, 400, 500, 750, 1000, 1500, 2000, 3000, 5000, Infinity];
+function bandAgg(list, test) {
+  const g = list.filter(test); if (!g.length) return null;
+  const a = g.reduce((s, r) => (s.n += r.net, s.gmv += r.gmv, s.cm += r.cm, s.good += r.V === 'Good', s.c++, s.d += r.d, s.wn += r.p.E.n, s.dn += r.p.W.n, s.ed += r.p.E.d, s.wd += r.p.W.d, s), { n: 0, gmv: 0, cm: 0, good: 0, c: 0, d: 0, wn: 0, dn: 0, ed: 0, wd: 0 });
+  a.cmp = a.gmv ? a.cm / a.gmv * 100 : null; a.bpo = a.n ? -a.cm / a.n : null; return a;
+}
+function renderCoin() {
+  const C = VIEW.combos.filter(r => r.d > 0); const tot = C.reduce((s, r) => s + r.net, 0) || 1;
+  const colr = cp => cp == null ? VC.Low : cp >= G.cmG ? VC.Good : cp < G.cmW ? VC.Worst : VC.Average;
+  const mk = (bands, fld) => { const L = [], b = [], cl = [], ln = [], tp = [], tb = [];
+    bands.forEach(([lo, hi, lab]) => { const a = bandAgg(C, r => r[fld] != null && r[fld] >= lo && r[fld] < hi); if (!a) return; L.push(lab); b.push(a.n); cl.push(colr(a.cmp)); ln.push(a.cmp);
+      tp.push(`<b>${fld === 'coinp' ? 'Coin ' : 'Cash '}${lab}</b><br>${n0(a.n)} net orders (${pct(a.n / tot * 100)} of total) · ${a.c} SP/coin combos (${a.good} Good)<br>GMV ${inr(a.gmv)} · CM ${inr(a.cm)} · CM% ${pct(a.cmp)} · burn ₹${n0(a.bpo)}/order`); tb.push([lab, a]); });
+    return { L, b, cl, ln, tp, tb }; };
+  const cb = mk(CBANDS, 'coinp');
+  const kb = mk(KBANDS.slice(0, -1).map((lo, i) => [lo, KBANDS[i + 1], KBANDS[i + 1] === Infinity ? `₹${n0(lo)}+` : `₹${n0(lo)}–${n0(KBANDS[i + 1] - 1)}`]), 'cash');
+  const bf = v => v >= 1000 ? (v / 1000).toFixed(1) + 'k' : v < 10 ? v.toFixed(1) : n0(v);
+  chart($('c4'), { labels: cb.L, bars: [{ data: cb.b, colors: cb.cl }], line: { data: cb.ln }, bfmt: bf, tip: i => cb.tp[i] });
+  chart($('c5'), { labels: kb.L, bars: [{ data: kb.b, colors: kb.cl }], line: { data: kb.ln }, bfmt: bf, tip: i => kb.tp[i] });
+  const sc = a => (a.cmp ?? -1e9);
+  const pick = tb => { const ok = tb.filter(([, a]) => a.n >= Math.max(G.min, tot * 0.02)); if (!ok.length) return null;
+    const maxN = Math.max(...ok.map(([, a]) => a.n)); const good = ok.filter(([, a]) => a.cmp != null && a.cmp >= G.cmG);
+    const best = (good.length ? good : ok).sort((x, y) => y[1].n - x[1].n || sc(y[1]) - sc(x[1]))[0]; const vol = ok.sort((x, y) => y[1].n - x[1].n)[0];
+    const worst = [...ok].sort((x, y) => sc(x[1]) - sc(y[1]))[0]; return { best, vol, worst, good: good.length > 0 }; };
+  const pc = pick(cb.tb), pk = pick(kb.tb);
+  const line = (p, w) => !p ? 'Not enough data in this filter.' :
+    `<b>${p.good ? 'Works best' : 'Least-bad'}:</b> ${w} ${p.best[0]} — ${n0(p.best[1].n)} orders at CM% ${pct(p.best[1].cmp)}.` + (p.vol !== p.best ? ` Most orders: ${p.vol[0]} (${n0(p.vol[1].n)}, CM% ${pct(p.vol[1].cmp)}).` : '') + (p.worst !== p.best ? ` <b>Worst CM:</b> ${p.worst[0]} (CM% ${pct(p.worst[1].cmp)}).` : '');
+  $('coinNote').innerHTML = line(pc, 'coin'); $('cashNote').innerHTML = line(pk, 'cash');
+}
+
+// ---------- charts ----------
+const ICONS = {"orders": "<path d=\"M6 2l1.5 4h9L18 2\"/><path d=\"M3 6h18l-2 14H5z\"/><path d=\"M9 11a3 3 0 006 0\"/>", "gmv": "<path d=\"M12 2v20\"/><path d=\"M17 5H9.5a3.5 3.5 0 000 7h5a3.5 3.5 0 010 7H6\"/>", "tag": "<path d=\"M20.6 13.4l-7.2 7.2a2 2 0 01-2.8 0L2 12V2h10l8.6 8.6a2 2 0 010 2.8z\"/><circle cx=\"7\" cy=\"7\" r=\"1.5\"/>", "coin": "<circle cx=\"12\" cy=\"12\" r=\"9\"/><path d=\"M9 9h4.5a2 2 0 010 4H9h5a2 2 0 010 4H9\"/>", "flame": "<path d=\"M12 22c4 0 7-3 7-7 0-5-5-7-5-12-3 2-5 5-5 8-1-1-2-2-2-4-2 2-2 5-2 8 0 4 3 7 7 7z\"/>", "pct": "<path d=\"M19 5L5 19\"/><circle cx=\"7\" cy=\"7\" r=\"2.5\"/><circle cx=\"17\" cy=\"17\" r=\"2.5\"/>", "down": "<path d=\"M3 7l6 6 4-4 8 8\"/><path d=\"M21 11v6h-6\"/>", "gem": "<path d=\"M6 3h12l4 6-10 12L2 9z\"/><path d=\"M2 9h20\"/>", "ret": "<path d=\"M3 12a9 9 0 109-9\"/><path d=\"M3 4v5h5\"/>", "cal": "<rect x=\"3\" y=\"4\" width=\"18\" height=\"18\" rx=\"2\"/><path d=\"M16 2v4M8 2v4M3 10h18\"/>", "grid": "<rect x=\"3\" y=\"3\" width=\"7\" height=\"7\" rx=\"1\"/><rect x=\"14\" y=\"3\" width=\"7\" height=\"7\" rx=\"1\"/><rect x=\"3\" y=\"14\" width=\"7\" height=\"7\" rx=\"1\"/><rect x=\"14\" y=\"14\" width=\"7\" height=\"7\" rx=\"1\"/>"};
+const KICON = ['orders','gmv','tag','coin','flame','pct','down','gem','ret','cal','grid'];
+const VC = { Good: '#10b981', Average: '#f59e0b', Worst: '#f43f5e', Low: '#94a3b8' };
+function hexA(h, a) { h = h.replace('#', ''); const n = parseInt(h, 16); return `rgba(${n >> 16 & 255},${n >> 8 & 255},${n & 255},${a})`; }
+function lighten(h, f) { h = h.replace('#', ''); const n = parseInt(h, 16); const c = x => Math.round(x + (255 - x) * f); return `rgb(${c(n >> 16 & 255)},${c(n >> 8 & 255)},${c(n & 255)})`; }
+function rrect(c, x, y, w, h, r) { r = Math.min(r, w / 2, Math.abs(h)); c.beginPath(); c.moveTo(x, y + h); c.lineTo(x, y + r); c.quadraticCurveTo(x, y, x + r, y); c.lineTo(x + w - r, y); c.quadraticCurveTo(x + w, y, x + w, y + r); c.lineTo(x + w, y + h); c.closePath(); }
+function chart(cv, cfg) {
+  const box = cv.parentElement, tip = box.querySelector('.tip'), dpr = window.devicePixelRatio || 1;
+  const W = box.clientWidth, H = box.clientHeight; cv.width = W * dpr; cv.height = H * dpr; const c = cv.getContext('2d'); c.setTransform(dpr, 0, 0, dpr, 0, 0); c.clearRect(0, 0, W, H);
+  const L = cfg.labels; c.font = '600 11px Inter, Segoe UI, Arial'; c.fillStyle = '#94a3b8';
+  if (!L.length) { c.textAlign = 'center'; c.fillText('No data for current filters', W / 2, H / 2); cv.onmousemove = null; return; }
+  const pad = { l: 52, r: cfg.line ? 50 : 14, t: 14, b: 60 }, pw = W - pad.l - pad.r, ph = H - pad.t - pad.b;
+  const bmax = Math.max(1e-9, ...cfg.bars.flatMap(b => b.data.filter(isFinite))) * 1.12;
+  const lv = cfg.line ? cfg.line.data.filter(v => v != null && isFinite(v)) : []; let lmin = Math.min(0, ...lv), lmax = Math.max(0, ...lv); if (lmax - lmin < 1) lmax = lmin + 1; const lr = (lmax - lmin) * 0.12; lmin -= lr; lmax += lr;
+  const y = v => pad.t + ph - v / bmax * ph, yl = v => pad.t + ph - (v - lmin) / (lmax - lmin) * ph;
+  c.lineWidth = 1; c.textAlign = 'right';
+  for (let i = 0; i <= 4; i++) { const v = bmax / 1.12 * i / 4, yy = Math.round(y(v)) + .5; c.strokeStyle = i ? '#eef1f7' : '#cbd5e1'; c.setLineDash(i ? [4, 4] : []); c.beginPath(); c.moveTo(pad.l, yy); c.lineTo(W - pad.r, yy); c.stroke(); c.fillStyle = '#94a3b8'; c.fillText(cfg.bfmt(v), pad.l - 8, yy + 4); }
+  c.setLineDash([]);
+  if (cfg.line) { c.textAlign = 'left'; c.fillStyle = '#f43f5e'; for (let i = 0; i <= 4; i++) { const v = lmin + (lmax - lmin) * i / 4; c.fillText(v.toFixed(0) + '%', W - pad.r + 8, yl(v) + 4); }
+    if (lmin < 0 && lmax > 0) { c.strokeStyle = '#fecdd3'; c.setLineDash([3, 3]); c.beginPath(); c.moveTo(pad.l, yl(0)); c.lineTo(W - pad.r, yl(0)); c.stroke(); c.setLineDash([]); } }
+  const n = L.length, slot = pw / n, nb = cfg.bars.length, bw = Math.max(2, Math.min(40, slot * 0.72 / nb));
+  cfg.bars.forEach((b, j) => b.data.forEach((v, i) => { if (!isFinite(v) || v <= 0) return; const col = b.colors ? b.colors[i] : b.color; const x = pad.l + slot * i + slot / 2 - bw * nb / 2 + bw * j, yy = y(v), hh = pad.t + ph - yy;
+    const g = c.createLinearGradient(0, yy, 0, pad.t + ph); g.addColorStop(0, col); g.addColorStop(1, lighten(col, .55)); c.fillStyle = g; c.shadowColor = hexA(col.startsWith('#') ? col : '#6366f1', .25); c.shadowBlur = 8; c.shadowOffsetY = 3;
+    rrect(c, x + (nb > 1 ? 1 : 0), yy, bw - (nb > 1 ? 2 : 0), hh, 6); c.fill(); c.shadowBlur = 0; c.shadowOffsetY = 0; }));
+  if (cfg.line) {
+    const pts = []; cfg.line.data.forEach((v, i) => { if (v != null && isFinite(v)) pts.push([pad.l + slot * i + slot / 2, yl(v)]); });
+    const path = () => { c.beginPath(); pts.forEach((p, i) => { if (!i) c.moveTo(p[0], p[1]); else { const q = pts[i - 1], mx = (q[0] + p[0]) / 2; c.bezierCurveTo(mx, q[1], mx, p[1], p[0], p[1]); } }); };
+    if (pts.length > 1) { path(); c.lineTo(pts[pts.length - 1][0], pad.t + ph); c.lineTo(pts[0][0], pad.t + ph); c.closePath(); const ag = c.createLinearGradient(0, pad.t, 0, pad.t + ph); ag.addColorStop(0, 'rgba(244,63,94,.18)'); ag.addColorStop(1, 'rgba(244,63,94,0)'); c.fillStyle = ag; c.fill(); }
+    path(); c.strokeStyle = '#f43f5e'; c.lineWidth = 2.5; c.shadowColor = 'rgba(244,63,94,.45)'; c.shadowBlur = 6; c.stroke(); c.shadowBlur = 0;
+    const pr = pts.length > 25 ? 2.2 : 3.8; pts.forEach(p => { c.beginPath(); c.arc(p[0], p[1], pr, 0, 7); c.fillStyle = '#fff'; c.fill(); c.lineWidth = pr > 3 ? 2 : 1.5; c.strokeStyle = '#f43f5e'; c.stroke(); });
+  }
+  c.fillStyle = '#64748b'; c.font = '500 11px Inter, Segoe UI, Arial'; const every = Math.ceil(n / Math.max(1, Math.floor(pw / 22)));
+  L.forEach((l, i) => { if (i % every) return; const x = pad.l + slot * i + slot / 2; c.save(); c.translate(x, H - pad.b + 14); if (n > 8) { c.rotate(-0.6); c.textAlign = 'right'; } else c.textAlign = 'center'; c.fillText(l.length > 22 ? l.slice(0, 21) + '…' : l, 0, 0); c.restore(); });
+  cv.onmousemove = e => { const rc = cv.getBoundingClientRect(), mx = e.clientX - rc.left, i = Math.floor((mx - pad.l) / slot);
+    if (i < 0 || i >= n) { tip.style.display = 'none'; return; } tip.innerHTML = cfg.tip(i); tip.style.display = 'block';
+    let tx = mx + 14; if (tx + tip.offsetWidth > W) tx = mx - tip.offsetWidth - 14; tip.style.left = Math.max(0, tx) + 'px'; tip.style.top = Math.max(0, e.clientY - rc.top - 34) + 'px'; };
+  cv.onmouseleave = () => tip.style.display = 'none';
+}
+function donut(cv, segs, center, sub) {
+  const box = cv.parentElement, tip = box.querySelector('.tip'), dpr = window.devicePixelRatio || 1;
+  const W = box.clientWidth, H = box.clientHeight; cv.width = W * dpr; cv.height = H * dpr; const c = cv.getContext('2d'); c.setTransform(dpr, 0, 0, dpr, 0, 0); c.clearRect(0, 0, W, H);
+  const tot = segs.reduce((s, x) => s + x.v, 0), cx = W / 2, cy = H / 2, R = Math.min(W, H) / 2 - 8, r = R * 0.64;
+  if (!tot) { c.fillStyle = '#94a3b8'; c.textAlign = 'center'; c.font = '600 12px Inter, Segoe UI'; c.fillText('No data', cx, cy); return; }
+  let a0 = -Math.PI / 2; const arcs = [];
+  segs.forEach(s => { if (!s.v) return; const a1 = a0 + s.v / tot * Math.PI * 2; const g = c.createLinearGradient(cx - R, cy - R, cx + R, cy + R); g.addColorStop(0, lighten(s.c, .25)); g.addColorStop(1, s.c);
+    c.beginPath(); c.arc(cx, cy, R, a0 + 0.012, a1 - 0.012); c.arc(cx, cy, r, a1 - 0.012, a0 + 0.012, true); c.closePath(); c.fillStyle = g; c.shadowColor = hexA(s.c, .3); c.shadowBlur = 10; c.fill(); c.shadowBlur = 0; arcs.push([a0, a1, s]); a0 = a1; });
+  c.textAlign = 'center'; c.fillStyle = '#0f172a'; c.font = '800 22px Inter, Segoe UI'; c.fillText(center, cx, cy + 4); c.fillStyle = '#64748b'; c.font = '600 11px Inter, Segoe UI'; c.fillText(sub, cx, cy + 22);
+  cv.onmousemove = e => { const rc = cv.getBoundingClientRect(), x = e.clientX - rc.left - cx, y2 = e.clientY - rc.top - cy, d = Math.hypot(x, y2); let a = Math.atan2(y2, x); if (a < -Math.PI / 2) a += Math.PI * 2;
+    const hit = d >= r && d <= R && arcs.find(([s, t]) => a >= s && a < t); if (!hit) { tip.style.display = 'none'; return; }
+    const s = hit[2]; tip.innerHTML = `<b>${s.l}</b><br>${s.t || n0(s.v)} · ${pct(s.v / tot * 100)}`; tip.style.display = 'block'; tip.style.left = Math.min(W - tip.offsetWidth, e.clientX - rc.left + 12) + 'px'; tip.style.top = (e.clientY - rc.top - 30) + 'px'; };
+  cv.onmouseleave = () => tip.style.display = 'none';
+}
+function dleg(id, segs) { const tot = segs.reduce((s, x) => s + x.v, 0) || 1; $(id).innerHTML = segs.filter(s => s.v).map(s => `<div><i style="background:${s.c}"></i>${s.l}<b>${pct(s.v / tot * 100)}</b></div>`).join(''); }
+function renderDonuts(weK, wdK) {
+  const R = VIEW.rows, cnt = v => R.filter(r => r.V === v).length;
+  const s1 = [{ l: 'Good', v: cnt('Good'), c: '#10b981' }, { l: 'Average', v: cnt('Average'), c: '#f59e0b' }, { l: 'Worst', v: cnt('Worst'), c: '#f43f5e' }, { l: 'Low data', v: cnt('Low'), c: '#94a3b8' }];
+  donut($('d1'), s1, n0(R.length), 'price points'); dleg('d1l', s1);
+  const s2 = [{ l: 'Mon–Fri', v: wdK.n, c: '#6366f1', t: n0(wdK.n) + ' orders · CM% ' + pct(wdK.cmp) }, { l: 'Sat & Sun', v: weK.n, c: '#f97316', t: n0(weK.n) + ' orders · CM% ' + pct(weK.cmp) }];
+  donut($('d2'), s2, n0(weK.n + wdK.n), 'net orders'); dleg('d2l', s2);
+  const pal = ['#94a3b8', '#22d3ee', '#0ea5e9', '#6366f1', '#8b5cf6', '#d946ef', '#ec4899', '#f43f5e', '#be123c'];
+  const C = VIEW.combos; const s3 = CBANDS.map(([lo, hi, lab], i) => { const g = C.filter(r => r.coinp != null && r.coinp >= lo && r.coinp < hi); const n = g.reduce((s, r) => s + r.net, 0), gm = g.reduce((s, r) => s + r.gmv, 0), cm = g.reduce((s, r) => s + r.cm, 0);
+    return { l: lab, v: n, c: pal[i], t: n0(n) + ' orders · CM% ' + pct(gm ? cm / gm * 100 : null) }; });
+  donut($('d3'), s3, pct(VIEW.K.acoinp), 'avg coin %'); dleg('d3l', s3);
+}
+const BANDS = [0, 150, 200, 300, 400, 500, 750, 1000, 1500, 2000, 3000, 5000, 10000, Infinity];
+function renderCharts() {
+  const { rows, daily } = VIEW; const live = rows.filter(r => r.d > 0);
+  const nProd = new Set(live.map(r => r.p.pi)).size;
+  let L = [], bars = [], cols = [], line = [], tips = [];
+  if (nProd === 1 || (live.length && live.length <= 25 && nProd <= 3)) {
+    const s = [...live].sort((a, b) => a.price - b.price || a.pid.localeCompare(b.pid));
+    s.forEach(r => { L.push('₹' + n0(r.price) + (nProd > 1 ? ' · ' + r.pid : '')); bars.push(r.opd); cols.push(VC[r.V]); line.push(r.cmp);
+      tips.push(`<b>₹${n0(r.price)}</b> · ${esc(r.pid)} · <b>${VL(r.V)}</b>${r.best ? ' ★ best' : ''}<br>${n2(r.opd)} orders/day · ${n0(r.net)} net orders · ${r.d} days<br>CM% ${pct(r.cmp)} · burn ₹${n0(r.bpo)}/order · GMV ${inr(r.gmv)}`); });
+    $('c1s').textContent = '— orders/day at each selling price (bar colour = verdict) & CM %';
+    $('c1l').innerHTML = Object.entries(VC).map(([k, v]) => `<span><i style="background:${v}"></i>${VL(k)}</span>`).join('') + '<span><i style="background:#f43f5e;height:3px"></i>CM %</span>';
+  } else {
+    for (let i = 0; i < BANDS.length - 1; i++) {
+      const g = live.filter(r => r.price >= BANDS[i] && r.price < BANDS[i + 1]); if (!g.length) continue;
+      const a = g.reduce((s, r) => (s.n += r.net, s.gmv += r.gmv, s.cm += r.cm, s.good += r.V === 'Good', s.c++, s), { n: 0, gmv: 0, cm: 0, good: 0, c: 0 });
+      const lab = BANDS[i + 1] === Infinity ? `₹${n0(BANDS[i])}+` : `₹${n0(BANDS[i])}–${n0(BANDS[i + 1] - 1)}`;
+      L.push(lab); bars.push(a.n); const cp = a.gmv ? a.cm / a.gmv * 100 : null; line.push(cp);
+      cols.push(cp == null ? VC.Low : cp >= G.cmG ? VC.Good : cp < G.cmW ? VC.Worst : VC.Average);
+      tips.push(`<b>${lab}</b><br>${n0(a.n)} net orders · ${a.c} price points (${a.good} Good)<br>GMV ${inr(a.gmv)} · CM ${inr(a.cm)} · CM% ${pct(cp)}`);
+    }
+    $('c1s').textContent = '— net orders by selling-price band (bar colour = CM% guardrail) & CM %. Filter one product to see its exact price points.';
+    $('c1l').innerHTML = `<span><i style="background:${VC.Good}"></i>CM% ≥ ${G.cmG}%</span><span><i style="background:${VC.Average}"></i>between</span><span><i style="background:${VC.Worst}"></i>CM% &lt; ${G.cmW}%</span><span><i style="background:#f43f5e;height:3px"></i>CM %</span>`;
+  }
+  chart($('c1'), { labels: L, bars: [{ data: bars, colors: cols }], line: { data: line }, bfmt: v => v >= 1000 ? (v / 1000).toFixed(1) + 'k' : v < 10 ? v.toFixed(1) : n0(v), tip: i => tips[i] });
+  const ds = [...daily.keys()].sort((a, b) => a - b), dd = ds.map(d => fin(daily.get(d)));
+  chart($('c2'), { labels: ds.map(d => s2lbl(d) + (dow(d) === 6 ? ' Sa' : dow(d) === 0 ? ' Su' : '')), bars: [{ data: dd.map(x => x.n), colors: ds.map(d => dow(d) % 6 === 0 ? '#f97316' : '#6366f1') }], line: { data: dd.map(x => x.cmp) },
+    bfmt: v => v >= 1000 ? (v / 1000).toFixed(1) + 'k' : n0(v), tip: i => `<b>${s2d(ds[i]).toUTCString().slice(0, 16)}</b><br>${n0(dd[i].n)} net orders · GMV ${inr(dd[i].gmv)}<br>CM ${inr(dd[i].cm)} · CM% ${pct(dd[i].cmp)} · coins ${inr(dd[i].co)}` });
+  const top = [...rows].filter(r => r.p.E.d || r.p.W.d).sort((a, b) => b.p.A.n - a.p.A.n).slice(0, 15);
+  chart($('c3'), { labels: top.map(r => '₹' + n0(r.price) + ' · ' + r.pid), bars: [{ data: top.map(r => r.weOpd), color: '#f97316' }, { data: top.map(r => r.wdOpd), color: '#6366f1' }],
+    bfmt: v => v.toFixed(1), tip: i => { const r = top[i]; return `<b>₹${n0(r.price)}</b> · ${esc(r.pid)} · ${esc(r.title.slice(0, 40))}<br>Sat/Sun ${n2(r.weOpd)}/day (${r.p.E.d} days) · Mon–Fri ${n2(r.wdOpd)}/day (${r.p.W.d} days)<br>Incl. Sat/Sun: <b>${VL(r.VA)}</b> · Excl. Sat/Sun: <b>${VL(r.VW)}</b>`; } });
+}
+function renderWeekend() {
+  const R = VIEW.rows.filter(r => r.VA !== 'Low');
+  const wdep = R.filter(r => r.VA === 'Good' && r.VW !== 'Good'), hold = R.filter(r => r.VA === 'Good' && r.VW === 'Good'),
+    wdg = R.filter(r => r.VA !== 'Good' && r.VW === 'Good'), wed = R.filter(r => r.drv === 'we' || r.drv === 'weonly'), wdd = R.filter(r => r.drv === 'wd' || r.drv === 'wdonly');
+  const ex = l => [...l].sort((a, b) => b.p.A.n - a.p.A.n).slice(0, 3).map(r => `₹${n0(r.price)} (${esc(r.pid)})`).join(', ') || '—';
+  $('wkCards').innerHTML = [
+    ['Good incl. & excl. Sat/Sun', hold.length, 'Strong every day — safest prices', ex(hold), 'linear-gradient(135deg,#10b981,#047857)'],
+    ['Good only with Sat/Sun', wdep.length, 'Weekends lift them into Good; weekdays fall short', ex(wdep), 'linear-gradient(135deg,#f59e0b,#ea580c)'],
+    ['Good only Mon–Fri', wdg.length, 'Sat/Sun days drag these down', ex(wdg), 'linear-gradient(135deg,#6366f1,#4338ca)'],
+    ['Weekend-driven orders', wed.length, `Sat/Sun orders/day ≥ ${G.we}% above Mon–Fri`, ex(wed), 'linear-gradient(135deg,#f97316,#db2777)'],
+    ['Weekday-driven orders', wdd.length, `Mon–Fri orders/day ≥ ${G.we}% above Sat/Sun`, ex(wdd), 'linear-gradient(135deg,#0ea5e9,#6366f1)']
+  ].map(([l, v, s, e, bg]) => `<div class="b" style="background:${bg}"><div class="l">${l}</div><div class="v">${v}</div><div class="s">${s}</div><div class="s" style="margin-top:4px">e.g. ${e}</div></div>`).join('');
+}
+
+// ---------- tables ----------
+const pill = v => `<span class="pill p-${v}">${VL(v)}</span>`;
+const DRV = { we: ['Weekend-driven', 'd-we'], wd: ['Weekday-driven', 'd-wd'], st: ['Steady', 'd-st'], weonly: ['Sat/Sun only', 'd-we'], wdonly: ['Mon–Fri only', 'd-wd'] };
+const COLS_PP = [
+  ['pid', 'Product ID'], ['upc', 'UPC / Vendor SKU'], ['title', 'Title'], ['price', 'Selling price', 1], ['mrp', 'MRP', 1], ['disc', 'Disc %', 1], ['acoinp', 'Avg coin %', 1], ['acash', 'Avg cash', 1], ['d', 'Days live', 1], ['net', 'Net orders', 1], ['opd', 'DRR (orders/day)', 1], ['idx', 'Velocity ×', 1],
+  ['gmv', 'Net GMV', 1], ['cm', 'CM (Burn)', 1], ['cmp', 'CM %', 1], ['bpo', 'Burn/order', 1], ['co', 'Coins burn', 1], ['ret', 'Return %', 1],
+  ['weOpd', 'Sat-Sun /day', 1], ['wdOpd', 'Mon-Fri /day', 1], ['lift', 'Wkend lift', 1], ['drv', 'Day driver'], ['V', 'Verdict'], ['VA', 'Incl. Sat/Sun'], ['VW', 'Excl. Sat/Sun'], ['checks', 'Guardrail check'], ['remark', 'Remarks']];
+function cellPP(r, k) {
+  switch (k) {
+    case 'pid': return `<td>${r.best ? '<span class="star">★</span> ' : ''}${esc(r.pid)}</td>`; case 'upc': return `<td>${esc(r.upc)}</td>`;
+    case 'title': return `<td class="title" title="${esc(r.title)}">${esc(r.title)}</td>`;
+    case 'acoinp': case 'coinp': case 'share': case 'wCoinp': case 'wCmp': return `<td class="n">${pct(r[k])}</td>`;
+    case 'acash': case 'cash': case 'coin': case 'wSp': case 'wCash': return `<td class="n">${r[k] == null ? '–' : '₹' + n0(r[k])}</td>`;
+    case 'lf': return `<td>${r.lf == null ? '–' : s2lbl(r.lf) + (r.ll !== r.lf ? ' – ' + s2lbl(r.ll) : '')}</td>`;
+    case 'pidNet': case 'nC': return `<td class="n">${n0(r[k])}</td>`;
+    case 'price': return `<td class="n"><b>₹${n0(r.price)}</b></td>`; case 'mrp': return `<td class="n">₹${n0(r.mrp)}</td>`; case 'disc': return `<td class="n">${pct(r.disc)}</td>`;
+    case 'd': case 'net': return `<td class="n">${n0(r[k])}</td>`; case 'opd': case 'weOpd': case 'wdOpd': return `<td class="n">${n2(r[k])}</td>`;
+    case 'idx': return `<td class="n">${r.idx == null ? '–' : n2(r.idx) + '×'}</td>`;
+    case 'gmv': return `<td class="n">${inr(r.gmv)}</td>`; case 'cm': return `<td class="n ${r.cm < 0 ? 'neg' : 'pos'}">${inr(r.cm)}</td>`; case 'co': return `<td class="n">${inr(r.co)}</td>`;
+    case 'cmp': return `<td class="n ${(r.cmp ?? 0) < 0 ? 'neg' : 'pos'}">${pct(r.cmp)}</td>`; case 'bpo': return `<td class="n">${r.bpo == null ? '–' : (r.bpo < 0 ? '+₹' + n0(-r.bpo) : '₹' + n0(r.bpo))}</td>`;
+    case 'ret': return `<td class="n">${pct(r.ret)}</td>`; case 'lift': return `<td class="n">${r.lift == null ? '–' : r.lift === Infinity ? '∞' : (r.lift > 0 ? '+' : '') + n0(r.lift) + '%'}</td>`;
+    case 'drv': return `<td><span class="drv ${DRV[r.drv][1]}">${DRV[r.drv][0]}</span></td>`;
+    case 'V': case 'VA': case 'VW': return `<td>${pill(r[k])}</td>`;
+    case 'checks': return `<td>${r.checks.map(c => `<span class="chk c-${c.s}" title="${c.k}: ${c.t}">${c.s === 'good' ? '✓' : c.s === 'worst' ? '✗' : c.s === 'na' ? '·' : '!'} ${c.k} ${c.t}</span>`).join('') || '<span class="chk c-na">✗ min orders</span>'}</td>`;
+    case 'remark': return `<td class="wrapc">${esc(r.remark)}</td>`;
+  }
+  return `<td>${esc(r[k])}</td>`;
+}
+function prodRows() {
+  const { prods, sel } = VIEW; const byPi = new Map(); VIEW.rows.forEach(r => { let a = byPi.get(r.p.pi); if (!a) byPi.set(r.p.pi, a = []); a.push(r); });
+  const out = [];
+  for (const [pi, list] of byPi) {
+    const P = DATA.P[pi], a = list.reduce((s, r) => (s.n += r.net, s.gmv += r.gmv, s.cm += r.cm, s.co += r.co, s), { n: 0, gmv: 0, cm: 0, co: 0 });
+    const best = list.find(r => r.best) || (list.length === 1 && list[0].V !== 'Low' ? list[0] : null), worst = list.find(r => r.worstP);
+    const el = elasticity(prods.get(pi), sel); const good = list.filter(r => r.V === 'Good').length;
+    let rec;
+    if (!best) rec = 'Not enough orders to judge any price point.';
+    else if (best.V === 'Good') rec = `Run ₹${n0(best.price)}: ${n1(best.opd)} orders/day at CM% ${pct(best.cmp)} (burn ₹${n0(best.bpo)}/order).` + (best.VA === 'Good' && best.VW === 'Good' ? ' Holds even without Sat/Sun.' : best.VA === 'Good' ? ' Relies on Sat/Sun.' : '');
+    else rec = `No price passes all guardrails; least-bad is ₹${n0(best.price)} (${VL(best.V)}, CM% ${pct(best.cmp)}).`;
+    if (worst) rec += ` Avoid ₹${n0(worst.price)} (${VL(worst.V)}, CM% ${pct(worst.cmp)}, ${n1(worst.opd)}/day).`;
+    if (el != null && el <= -1) rec += ' Demand reacts strongly to price.';
+    const V = best ? best.V : 'Low';
+    out.push({ pid: P[0], upc: P[1], title: P[2], brand: P[3], np: list.length, good, net: a.n, gmv: a.gmv, cm: a.cm, cmp: a.gmv ? a.cm / a.gmv * 100 : null, co: a.co,
+      bestP: best ? best.price : null, bestV: V, worstP: worst ? worst.price : null, worstV: worst ? worst.V : null, el, prices: list.map(r => r.price).sort((x, y) => x - y), V, remark: rec });
+  }
+  return out;
+}
+const COLS_PROD = [['pid', 'Product ID'], ['upc', 'UPC / Vendor SKU'], ['title', 'Title'], ['brand', 'Brand'], ['np', 'Price points', 1], ['prices', 'Prices tested'], ['good', 'Good prices', 1], ['net', 'Net orders', 1], ['gmv', 'Net GMV', 1], ['cm', 'CM (Burn)', 1], ['cmp', 'CM %', 1], ['co', 'Coins burn', 1], ['bestP', 'Best price', 1], ['bestV', 'Best verdict'], ['worstP', 'Worst price', 1], ['el', 'Elasticity', 1], ['remark', 'Recommendation']];
+function cellProd(r, k) {
+  switch (k) {
+    case 'pid': return `<td>${esc(r.pid)}</td>`;
+    case 'prices': return `<td>${r.prices.map(p => '₹' + n0(p)).join(', ')}</td>`; case 'np': case 'good': case 'net': return `<td class="n">${n0(r[k])}</td>`;
+    case 'bestP': case 'worstP': return `<td class="n"><b>${r[k] == null ? '–' : '₹' + n0(r[k])}</b></td>`; case 'bestV': return `<td>${pill(r.bestV)}</td>`;
+    case 'el': return `<td class="n" title="${elLbl(r.el)}">${r.el == null ? '–' : n2(r.el)}<div class="note">${r.el == null ? '' : elLbl(r.el)}</div></td>`;
+    case 'brand': return `<td>${esc(r.brand)}</td>`;
+    default: return cellPP(r, k);
+  }
+}
+const COLS_COMBO = [['pid', 'Product ID'], ['upc', 'UPC / Vendor SKU'], ['title', 'Title'], ['price', 'Selling price', 1], ['coin', 'Coin used / unit', 1], ['coinp', 'Coin %', 1], ['cash', 'Cash (SP − coin)', 1],
+  ['net', 'Net orders', 1], ['share', '% of PID orders', 1], ['d', 'Days live', 1], ['lf', 'Live dates'], ['opd', 'DRR (orders/day)', 1], ['idx', 'Velocity ×', 1], ['gmv', 'Net GMV', 1], ['cm', 'CM (Burn)', 1], ['cmp', 'CM %', 1], ['bpo', 'Burn/order', 1],
+  ['weOpd', 'Sat-Sun /day', 1], ['wdOpd', 'Mon-Fri /day', 1], ['V', 'Verdict'], ['VA', 'Incl. Sat/Sun'], ['VW', 'Excl. Sat/Sun'], ['checks', 'Guardrail check'], ['remark', 'Remarks']];
+const COLS_BEST = [['pid', 'Product ID'], ['upc', 'UPC / Vendor SKU'], ['title', 'Title'], ['pidNet', 'PID net orders', 1], ['nC', 'Combos tested', 1],
+  ['price', 'Best SP', 1], ['coinp', 'Best coin %', 1], ['coin', 'Coin ₹', 1], ['cash', 'Best cash', 1], ['net', 'Orders at best', 1], ['d', 'Days live', 1], ['lf', 'Live dates'], ['share', '% of PID orders', 1], ['opd', 'DRR (orders/day)', 1], ['cm', 'CM (Burn)', 1], ['cmp', 'CM %', 1], ['bpo', 'Burn/order', 1],
+  ['V', 'Verdict'], ['VA', 'Incl. Sat/Sun'], ['VW', 'Excl. Sat/Sun'], ['wSp', 'Worst SP', 1], ['wCoinp', 'Worst coin %', 1], ['wCash', 'Worst cash', 1], ['wCmp', 'Worst CM %', 1], ['remark', 'Remarks']];
+function tableData() {
+  const fv = $('fVer').value; let rows, cols, cell;
+  if (tab === 'prod') { rows = prodRows(); cols = COLS_PROD; cell = cellProd; if (fv) rows = rows.filter(r => r.V === fv); }
+  else if (tab === 'combo') { rows = VIEW.combos; cols = COLS_COMBO; cell = cellPP; if (fv) rows = rows.filter(r => r.V === fv); }
+  else if (tab === 'bestcombo') { rows = bestComboRows(); cols = COLS_BEST; cell = cellPP; if (fv) rows = rows.filter(r => r.V === fv); }
+  else { rows = VIEW.rows; cols = COLS_PP; cell = cellPP; if (fv) rows = rows.filter(r => r.V === fv);
+    if (tab === 'best') rows = rows.filter(r => r.V === 'Good'); if (tab === 'worst') rows = rows.filter(r => r.V === 'Worst'); }
+  const s = sorts[tab]; const key = s.k === 'checks' ? 'V' : s.k;
+  rows = [...rows].sort((a, b) => { let x = a[key], y = b[key]; if (Array.isArray(x)) { x = x[0]; y = y[0]; } if (x == null) return 1; if (y == null) return -1; return (typeof x === 'string' ? x.localeCompare(y) : x - y) * s.d; });
+  return { rows, cols, cell };
+}
+function renderTable() {
+  const { rows, cols, cell } = tableData(); const s = sorts[tab]; const pages = Math.max(1, Math.ceil(rows.length / PS)); if (page >= pages) page = pages - 1;
+  const notes = { bestcombo: 'One row per PID — best SP + coin % + cash = highest DRR (orders ÷ live days) among combos with CM% & burn at least Average; similar DRR → better CM% wins.', combo: 'One row per PID × selling price × coin used per unit. Coin % = coin ÷ SP; cash = SP − coin.', pp: 'One row per product × selling price. Verdict follows the “Days” filter; Incl./Excl. Sat-Sun columns always show both.', prod: 'One row per product — best price, worst price, elasticity and what to do.', best: 'Price points passing every guardrail — highest orders/day first.', worst: 'Price points breaching a worst guardrail — biggest CM burn first.' };
+  $('tblNote').textContent = `${rows.length.toLocaleString('en-IN')} rows · ${notes[tab]} Click a column header to sort.`;
+  if (!rows.length) { $('tbl').innerHTML = '<div class="empty">No rows match the current filters.</div>'; $('pager').innerHTML = ''; return; }
+  const slice = rows.slice(page * PS, page * PS + PS);
+  $('tbl').innerHTML = `<table><thead><tr>${cols.map(([k, l, n]) => `<th class="${n ? 'n' : ''}" data-k="${k}">${l}${s.k === k ? (s.d > 0 ? ' ▲' : ' ▼') : ''}</th>`).join('')}</tr></thead><tbody>${slice.map(r => `<tr>${cols.map(([k]) => cell(r, k)).join('')}</tr>`).join('')}</tbody></table>`;
+  $('tbl').querySelectorAll('th').forEach(th => th.onclick = () => { const k = th.dataset.k; if (s.k === k) s.d *= -1; else { s.k = k; s.d = typeof rows[0][k] === 'string' ? 1 : -1; } page = 0; renderTable(); });
+  $('pager').innerHTML = `<button class="btn" ${page ? '' : 'disabled'} id="pv">‹ Prev</button> Page ${page + 1} / ${pages} <button class="btn" ${page < pages - 1 ? '' : 'disabled'} id="nx">Next ›</button>`;
+  $('pv').onclick = () => { page--; renderTable(); }; $('nx').onclick = () => { page++; renderTable(); };
+}
+function exportCsv() {
+  const { rows, cols } = tableData(); const q = v => { v = v == null ? '' : Array.isArray(v) ? v.join(' | ') : typeof v === 'number' ? (isFinite(v) ? String(Math.round(v * 100) / 100) : '') : String(v); return /[",\n]/.test(v) ? '"' + v.replace(/"/g, '""') + '"' : v; };
+  const val = (r, k) => k === 'checks' ? r.checks.map(c => `${c.k}:${c.s}(${c.t})`).join('; ') : ['V', 'VA', 'VW', 'bestV', 'worstV'].includes(k) ? VL(r[k] || '') : k === 'drv' ? DRV[r.drv][0] : r[k];
+  const csv = '﻿' + [cols.map(c => q(c[1])).join(','), ...rows.map(r => cols.map(([k]) => q(val(r, k))).join(','))].join('\n');
+  const a = document.createElement('a'); a.href = URL.createObjectURL(new Blob([csv], { type: 'text/csv' })); a.download = `elasticity_${tab}_${new Date().toISOString().slice(0, 10)}.csv`; a.click();
+}
+
+// ---------- upload ----------
+function toast(m) { const t = $('toast'); t.textContent = m; t.style.display = 'block'; clearTimeout(t._h); t._h = setTimeout(() => t.style.display = 'none', 5000); }
+async function loadFile(f) {
+  if (!f) return; if (!/\.(xlsx|csv)$/i.test(f.name)) { toast('Please upload an .xlsx or .csv file'); return; }
+  $('overlay').style.display = 'flex'; $('ovMsg').textContent = 'Reading ' + f.name + '…'; $('ovSub').textContent = '';
+  try {
+    const buf = await f.arrayBuffer(); const t0 = performance.now();
+    const d = await Core.parseFile(f.name, buf, n => { $('ovSub').textContent = n.toLocaleString('en-IN') + ' rows read…'; });
+    DATA = null; VIEW = null; $('seed').textContent = ''; // wipe all old data
+    setData(d); toast(`Old data cleared. Now showing ${f.name} — ${d.rows.toLocaleString('en-IN')} rows (${((performance.now() - t0) / 1000).toFixed(1)}s)` + (d.skipped ? ` · ${d.skipped} rows skipped (no date/product id)` : ''));
+  } catch (e) { console.error(e); alert('Could not read this file: ' + e.message + '\nThe current data has been kept.'); }
+  finally { $('overlay').style.display = 'none'; $('file').value = ''; }
+}
+$('uplBtn').onclick = () => $('file').click(); $('file').onchange = e => loadFile(e.target.files[0]);
+let dragN = 0; addEventListener('dragenter', e => { e.preventDefault(); dragN++; $('drop').style.display = 'flex'; }); addEventListener('dragleave', () => { if (--dragN <= 0) { dragN = 0; $('drop').style.display = 'none'; } });
+addEventListener('dragover', e => e.preventDefault()); addEventListener('drop', e => { e.preventDefault(); dragN = 0; $('drop').style.display = 'none'; loadFile(e.dataTransfer.files[0]); });
+
+// ---------- wiring ----------
+let tm; const deb = () => { clearTimeout(tm); tm = setTimeout(() => { page = 0; render(); }, 250); };
+$('fPid').addEventListener('input', () => { delete $('fPid').dataset.auto; clearTimeout(tm); tm = setTimeout(() => { syncPair('pid'); page = 0; render(); }, 300); });
+$('fUpc').addEventListener('input', () => { delete $('fUpc').dataset.auto; clearTimeout(tm); tm = setTimeout(() => { syncPair('upc'); page = 0; render(); }, 300); });
+$('fTitle').addEventListener('input', deb);
+['fBrand', 'fL2'].forEach(i => $(i).addEventListener('change', () => delete $(i).dataset.auto));
+['fBrand', 'fL2', 'fFrom', 'fTo', 'fDay', 'fVer'].forEach(i => $(i).addEventListener('change', () => { page = 0; render(); }));
+$('clr').onclick = () => { if (!DATA) return; ['fUpc', 'fPid', 'fBrand', 'fL2'].forEach(i => delete $(i).dataset.auto); lastKey = null; ['fPid', 'fUpc', 'fTitle'].forEach(i => $(i).value = ''); ['fBrand', 'fL2', 'fVer'].forEach(i => $(i).value = ''); $('fDay').value = 'all'; $('fFrom').value = s2iso(DATA.min); $('fTo').value = s2iso(DATA.max); page = 0; render(); };
+Object.entries(GMAP).forEach(([id, k]) => { $(id).value = G[k]; $(id).addEventListener('change', () => { const v = parseFloat($(id).value); if (isFinite(v)) { G[k] = v; if (DATA) render(); } }); });
+$('tabs').onclick = e => { const t = e.target.closest('.tab'); if (!t) return; tab = t.dataset.t; page = 0; document.querySelectorAll('.tab').forEach(x => x.classList.toggle('on', x === t)); if (VIEW) renderTable(); };
+$('exp').onclick = () => VIEW && exportCsv();
+let rz; addEventListener('resize', () => { clearTimeout(rz); rz = setTimeout(() => VIEW && render(), 150); });
+try { const seed = JSON.parse($('seed').textContent); if (!seed) throw 0; setData(seed); } catch (e) { console.error(e); $('fileMeta').textContent = 'No data yet — upload a file to begin.'; $('kpis').innerHTML = '<div class="kpi empty"><div class="v">Upload your Suborder Level CM Data file to begin</div><div class="s">Click “Upload new file” or drag & drop an .xlsx / .csv. Data is processed only in your browser — nothing is uploaded to any server.</div></div>'; }
+window.__dash = { get VIEW() { return VIEW; }, get DATA() { return DATA; }, G, render };
+})();
+</script></body></html>
